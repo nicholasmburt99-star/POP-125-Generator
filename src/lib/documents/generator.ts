@@ -67,18 +67,18 @@ export async function generateAllDocuments(
   const pdfBuffer = await createPDF(pdfSections);
 
   // --- Upload to Vercel Blob ---
-  const docxFilename = `${docSetId}/${employerSlug}_Premium_Only_Plan.docx`;
-  const pdfFilename = `${docSetId}/${employerSlug}_Premium_Only_Plan.pdf`;
+  // Use timestamp to bust CDN cache on regeneration
+  const ts = Date.now();
+  const docxFilename = `${docSetId}/${employerSlug}_Premium_Only_Plan_${ts}.docx`;
+  const pdfFilename = `${docSetId}/${employerSlug}_Premium_Only_Plan_${ts}.pdf`;
 
   const [docxBlob, pdfBlob] = await Promise.all([
     put(docxFilename, docxBuffer, {
       access: "public",
-      allowOverwrite: true,
       contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     }),
     put(pdfFilename, pdfBuffer, {
       access: "public",
-      allowOverwrite: true,
       contentType: "application/pdf",
     }),
   ]);
