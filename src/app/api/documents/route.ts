@@ -39,7 +39,7 @@ export async function POST(request: Request) {
         createdById: user.id,
         employerName: formData.employer.legalBusinessName,
         employerEin: formData.employer.ein,
-        formData: JSON.stringify(formData),
+        formData: formData,
         status: "generating",
       },
     });
@@ -70,9 +70,11 @@ export async function POST(request: Request) {
 
     return NextResponse.json(updated);
   } catch (err) {
-    console.error("Document generation error:", err);
+    const message = err instanceof Error ? err.message : String(err);
+    const stack = err instanceof Error ? err.stack : "";
+    console.error("Document generation error:", message, stack);
     return NextResponse.json(
-      { error: "Failed to generate documents" },
+      { error: `Failed to generate documents: ${message}` },
       { status: 500 }
     );
   }
