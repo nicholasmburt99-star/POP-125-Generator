@@ -63,10 +63,15 @@ const defaultFormData: FormData = {
   },
 };
 
-export function FormWizard() {
+interface FormWizardProps {
+  initialData?: FormData;
+  editId?: string; // If set, we're editing an existing document set
+}
+
+export function FormWizard({ initialData, editId }: FormWizardProps = {}) {
   const router = useRouter();
   const [step, setStep] = useState(0);
-  const [formData, setFormData] = useState<FormData>(defaultFormData);
+  const [formData, setFormData] = useState<FormData>(initialData || defaultFormData);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState("");
 
@@ -93,8 +98,11 @@ export function FormWizard() {
     setError("");
 
     try {
-      const res = await fetch("/api/documents", {
-        method: "POST",
+      const url = editId ? `/api/documents/${editId}` : "/api/documents";
+      const method = editId ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });

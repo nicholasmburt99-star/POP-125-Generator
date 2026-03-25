@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Plus, Download } from "lucide-react";
+import { Plus, Download, Pencil } from "lucide-react";
 import { format } from "date-fns";
 
 export default async function DashboardPage() {
@@ -77,28 +77,32 @@ export default async function DashboardPage() {
                   </Badge>
                 </div>
               </CardHeader>
-              {doc.status === "complete" && (
-                <CardContent className="pt-0">
-                  <div className="flex gap-2">
-                    {doc.docxBlobUrl && (
-                      <a href={doc.docxBlobUrl} download>
-                        <Button variant="outline" size="sm" className="gap-2">
-                          <Download className="h-3 w-3" />
-                          Word (.docx)
-                        </Button>
-                      </a>
-                    )}
-                    {doc.pdfBlobUrl && (
-                      <a href={doc.pdfBlobUrl} download>
-                        <Button variant="outline" size="sm" className="gap-2">
-                          <Download className="h-3 w-3" />
-                          PDF
-                        </Button>
-                      </a>
-                    )}
-                  </div>
-                </CardContent>
-              )}
+              <CardContent className="pt-0">
+                <div className="flex gap-2">
+                  <Link href={`/dashboard/generate/${doc.id}/edit`}>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <Pencil className="h-3 w-3" />
+                      Edit
+                    </Button>
+                  </Link>
+                  {doc.status === "complete" && doc.docxBlobUrl && (
+                    <a href={doc.docxBlobUrl} download>
+                      <Button variant="outline" size="sm" className="gap-2">
+                        <Download className="h-3 w-3" />
+                        Word (.docx)
+                      </Button>
+                    </a>
+                  )}
+                  {doc.status === "complete" && doc.pdfBlobUrl && (
+                    <a href={doc.pdfBlobUrl} download>
+                      <Button variant="outline" size="sm" className="gap-2">
+                        <Download className="h-3 w-3" />
+                        PDF
+                      </Button>
+                    </a>
+                  )}
+                </div>
+              </CardContent>
             </Card>
           ))}
         </div>

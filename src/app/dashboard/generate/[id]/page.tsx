@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Download, ArrowLeft, FileText } from "lucide-react";
+import { Download, ArrowLeft, FileText, Pencil } from "lucide-react";
 import { format } from "date-fns";
 
 export default async function DocumentDetailPage({
@@ -48,17 +48,25 @@ export default async function DocumentDetailPage({
                 {doc.createdBy.name || doc.createdBy.email}
               </CardDescription>
             </div>
-            <Badge
-              variant={
-                doc.status === "complete"
-                  ? "default"
-                  : doc.status === "error"
-                  ? "destructive"
-                  : "secondary"
-              }
-            >
-              {doc.status}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Link href={`/dashboard/generate/${doc.id}/edit`}>
+                <Button variant="outline" size="sm" className="gap-1">
+                  <Pencil className="h-3 w-3" />
+                  Edit &amp; Regenerate
+                </Button>
+              </Link>
+              <Badge
+                variant={
+                  doc.status === "complete"
+                    ? "default"
+                    : doc.status === "error"
+                    ? "destructive"
+                    : "secondary"
+                }
+              >
+                {doc.status}
+              </Badge>
+            </div>
           </div>
         </CardHeader>
         <CardContent>

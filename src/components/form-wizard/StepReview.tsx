@@ -182,7 +182,7 @@ export function StepReview({
         </Button>
         <Button onClick={onGenerate} disabled={generating} className="gap-2">
           {generating && <Loader2 className="h-4 w-4 animate-spin" />}
-          {generating ? "Generating..." : "Generate Documents"}
+          {generating ? "Generating..." : formData === undefined ? "Generate Documents" : "Generate Documents"}
         </Button>
       </div>
     </div>
