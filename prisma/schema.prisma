@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  name         String?
+  passwordHash String
+  role         String        @default("member")
+  createdAt    DateTime      @default(now())
+  documentSets DocumentSet[]
+}
+
+model DocumentSet {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  createdBy    User     @relation(fields: [createdById], references: [id])
+  createdById  String
+  employerName String
+  employerEin  String?
+  formData     String
+  docxBlobUrl  String?
+  pdfBlobUrl   String?
+  status       String   @default("draft")
+}
+
+model InviteCode {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  used      Boolean  @default(false)
+  usedBy    String?
+  createdAt DateTime @default(now())
+}
