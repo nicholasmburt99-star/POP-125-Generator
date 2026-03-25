@@ -8,9 +8,10 @@ export async function POST(request: Request) {
 
     // Validate invite code
     const expectedCode = process.env.INVITE_SECRET;
+    console.log("INVITE_SECRET defined:", !!expectedCode, "received:", inviteCode);
     if (!expectedCode || inviteCode !== expectedCode) {
       return NextResponse.json(
-        { error: "Invalid invite code" },
+        { error: `Invalid invite code (env set: ${!!expectedCode})` },
         { status: 403 }
       );
     }
