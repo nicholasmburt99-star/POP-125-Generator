@@ -1,7 +1,6 @@
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
+import { put } from "@vercel/blob";
 import type { FormData } from "@/types";
-import { buildDocx, pageBreak } from "./docx/docx-builder";
+import { buildDocx } from "./docx/docx-builder";
 import { buildPlanDocumentParagraphs } from "./docx/plan-document";
 import { buildSPDParagraphs } from "./docx/spd";
 import {
@@ -67,20 +66,23 @@ export async function generateAllDocuments(
 
   const pdfBuffer = await createPDF(pdfSections);
 
-  // Save files
-  const outputDir = join(process.cwd(), "public", "generated", docSetId);
-  await mkdir(outputDir, { recursive: true });
+  // --- Upload to Vercel Blob ---
+  const docxFilename = `${docSetId}/${employerSlug}_Premium_Only_Plan.docx`;
+  const pdfFilename = `${docSetId}/${employerSlug}_Premium_Only_Plan.pdf`;
 
-  const docxFilename = `${employerSlug}_Premium_Only_Plan.docx`;
-  const pdfFilename = `${employerSlug}_Premium_Only_Plan.pdf`;
-
-  await Promise.all([
-    writeFile(join(outputDir, docxFilename), docxBuffer),
-    writeFile(join(outputDir, pdfFilename), pdfBuffer),
+  const [docxBlob, pdfBlob] = await Promise.all([
+    put(docxFilename, docxBuffer, {
+      access: "public",
+      contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    }),
+    put(pdfFilename, pdfBuffer, {
+      access: "public",
+      contentType: "application/pdf",
+    }),
   ]);
 
-  const docxUrl = `/generated/${docSetId}/${docxFilename}`;
-  const pdfUrl = `/generated/${docSetId}/${pdfFilename}`;
-
-  return { docxUrl, pdfUrl };
+  return {
+    docxUrl: docxBlob.url,
+    pdfUrl: pdfBlob.url,
+  };
 }
