@@ -73,10 +73,12 @@ export async function generateAllDocuments(
   const [docxBlob, pdfBlob] = await Promise.all([
     put(docxFilename, docxBuffer, {
       access: "public",
+      allowOverwrite: true,
       contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     }),
     put(pdfFilename, pdfBuffer, {
       access: "public",
+      allowOverwrite: true,
       contentType: "application/pdf",
     }),
   ]);
