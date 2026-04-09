@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Download, ArrowLeft, FileText, Pencil } from "lucide-react";
 import { format } from "date-fns";
+import { DeleteButton } from "@/components/dashboard/DeleteButton";
 
 export default async function DocumentDetailPage({
   params,
@@ -55,6 +56,11 @@ export default async function DocumentDetailPage({
                   Edit &amp; Regenerate
                 </Button>
               </Link>
+              <DeleteButton
+                documentId={doc.id}
+                employerName={doc.employerName}
+                redirectTo="/dashboard"
+              />
               <Badge
                 variant={
                   doc.status === "complete"

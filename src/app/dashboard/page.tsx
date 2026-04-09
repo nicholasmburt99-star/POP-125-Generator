@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Plus, Download, Pencil } from "lucide-react";
 import { format } from "date-fns";
+import { DeleteButton } from "@/components/dashboard/DeleteButton";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -101,6 +102,7 @@ export default async function DashboardPage() {
                       </Button>
                     </a>
                   )}
+                  <DeleteButton documentId={doc.id} employerName={doc.employerName} />
                 </div>
               </CardContent>
             </Card>
