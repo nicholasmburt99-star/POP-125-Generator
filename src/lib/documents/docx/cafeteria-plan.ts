@@ -351,7 +351,62 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
     p.push(legalSection("E", "Flexible Spending Accounts"));
     p.push(noteText("If Flexible Spending Accounts are not a permitted Benefit under A.5b, Section E is disregarded."));
 
-    p.push(subheading("Contribution Limits"));
+    // ---- E.1 Matching Contributions ----
+    p.push(subheading("Employer Contributions"));
+    p.push(checkboxLine(false, "1.  Matching Contributions. The Plan permits Employer matching contributions to the applicable Benefits as follows:", { indent: 0, bold: true }));
+
+    const fsaSubBlocks: { letter: string; label: string; cfg: typeof cafe.fsa.healthFSA; show: boolean }[] = [
+      { letter: "a", label: "Health FSA:", cfg: cafe.fsa.healthFSA, show: features.healthFSA },
+      { letter: "b", label: "Limited Purpose/Post-Deductible Health Flexible Spending Account (HSA-Compatible FSA)", cfg: cafe.fsa.limitedPurposeFSA, show: features.limitedPurposeFSA || features.postDeductibleFSA },
+      { letter: "c", label: "Dependent Care Assistance Plan Account:", cfg: cafe.fsa.dcap, show: features.dcap },
+      { letter: "d", label: "Adoption Assistance Flexible Spending Account:", cfg: cafe.fsa.adoptionAssistanceFSA, show: features.adoptionAssistanceFSA },
+    ];
+
+    fsaSubBlocks.forEach((blk) => {
+      if (!blk.show) return;
+      p.push(body(`${blk.letter}.  ${blk.label}`, { indent: true, bold: true }));
+      p.push(checkboxLine(blk.cfg.matchingFormula === "none", "i.  None", { indent: 2 }));
+      p.push(checkboxLine(blk.cfg.matchingFormula === "discretionary", "ii.  Discretionary", { indent: 2 }));
+      p.push(checkboxLine(
+        blk.cfg.matchingFormula === "pct_of_contribution_pct",
+        `iii.  ${blk.cfg.matchingPct || "_____"}% of the Participant's contribution up to ${blk.cfg.matchingComplementPct || "_____"}% of the Participant's Compensation`,
+        { indent: 2 }
+      ));
+      p.push(checkboxLine(
+        blk.cfg.matchingFormula === "pct_of_contribution_dollar",
+        `iv.  ${blk.cfg.matchingPct || "_____"}% of the Participant's contribution up to $${blk.cfg.matchingComplementDollar || "_____"}`,
+        { indent: 2 }
+      ));
+      p.push(checkboxLine(blk.cfg.matchingFormula === "other", `v.  Other:  ${blk.cfg.matchingOther}`, { indent: 2 }));
+    });
+    p.push(noteText("If there are no Employer matching contributions to the Plan, questions under E.1 are disregarded."));
+    p.push(noteText("Only one contribution formula is permitted for each applicable Benefit."));
+    p.push(noteText("If the Plan is intended to be a simple cafeteria plan, the matching contributions in this section will apply in addition to the contributions at A.6b."));
+
+    // ---- E.2 Non-Elective Employer Contributions ----
+    p.push(checkboxLine(false, "2.  Non-Elective Employer Contributions. The Plan permits Employer contributions to the applicable Benefits as follows:", { indent: 0, bold: true }));
+    fsaSubBlocks.forEach((blk) => {
+      if (!blk.show) return;
+      p.push(body(`${blk.letter}.  ${blk.label}`, { indent: true, bold: true }));
+      p.push(checkboxLine(blk.cfg.nonElectiveFormula === "none", "i.  None", { indent: 2 }));
+      p.push(checkboxLine(blk.cfg.nonElectiveFormula === "discretionary", "ii.  Discretionary", { indent: 2 }));
+      p.push(checkboxLine(
+        blk.cfg.nonElectiveFormula === "pct_of_compensation",
+        `iii.  ${blk.cfg.nonElectivePct || "_____"}% of the Participant's Compensation`,
+        { indent: 2 }
+      ));
+      p.push(checkboxLine(
+        blk.cfg.nonElectiveFormula === "dollar_per_employee",
+        `iv.  $${blk.cfg.nonElectiveDollar || "_____"} per Eligible Employee`,
+        { indent: 2 }
+      ));
+      p.push(checkboxLine(blk.cfg.nonElectiveFormula === "other", `v.  Other:  ${blk.cfg.nonElectiveOther}`, { indent: 2 }));
+    });
+    p.push(noteText("If there are no non-elective Employer contributions, questions under E.2 are disregarded."));
+    p.push(noteText("Employer matching and non-elective contributions shall not exceed the limits set forth in the BPD including: Health FSA, Section 6.04(b); HSA-Compatible FSA Section 7.04; Dependent Care Assistance Plan Account Section 8.04; and Adoption Assistance Flexible Spending Account, Section 10.04."));
+    p.push(noteText("If the Plan is intended to be a simple cafeteria plan, the Employer non-elective contributions in this section will apply in addition to the contributions at A.6b."));
+
+    // ---- E.3 Contribution Limits ----
     p.push(body("3.  Contribution Limits. Select the maximum allowable Participant contribution to the applicable FSA in any Plan Year:", { bold: true }));
     p.push(checkboxLine(cafe.fsa.contributionLimitMode === "code_max", "a.  The maximum amount permitted under Code section 125(i), 129(a)(2) and/or 137(b)(1)", { indent: 1 }));
     p.push(checkboxLine(cafe.fsa.contributionLimitMode === "other_amount", "b.  Other amounts", { indent: 1 }));
@@ -361,36 +416,81 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
       if (features.dcap) p.push(body(`iii.  Dependent Care Assistance Plan Account: $${cafe.fsa.dcapLimit}`, { indent: true }));
       if (features.adoptionAssistanceFSA) p.push(body(`iv.  Adoption Assistance Flexible Spending Account: $${cafe.fsa.adoptionAssistanceLimit}`, { indent: true }));
     }
-    p.push(noteText("Other amounts for Health FSA cannot exceed the Code section 125(i) maximum. DCAP cannot exceed Code 129(a)(2). Adoption Assistance cannot exceed Code section 137(b)(1) maximum."));
+    p.push(noteText("Other amounts for Health Flexible Spending Account in E.3bi and Limited Purpose/Post-Deductible Health Flexible Spending Account in E.3ii cannot exceed the Code section 125(i) maximum. Other amounts in E.3b.iii for Dependent Care Assistance Plan Account cannot exceed Code 129(a)(2) amounts and E.3b(iv) cannot exceed Code section 137(b)(1) maximum."));
 
+    // ---- E.4 Eligible Expenses ----
     p.push(subheading("Eligible Expenses"));
     p.push(body("4.  Individual Expenses Eligible for Reimbursement. Participant may only be reimbursed from the applicable FSA for expenses that are incurred by:", { bold: true }));
-    p.push(checkboxLine(cafe.fsa.eligiblePersons === "participant_spouse_dep", "a.  Participant, spouse and Dependents (and any child of the Participant until his or her 26th birthday).", { indent: 1 }));
-    p.push(checkboxLine(cafe.fsa.eligiblePersons === "covered_under_employer", "b.  Persons covered under Employer-sponsored group health plan.", { indent: 1 }));
-    p.push(checkboxLine(cafe.fsa.eligiblePersons === "participant_only", "c.  Participants only.", { indent: 1 }));
-    p.push(checkboxLine(cafe.fsa.eligiblePersons === "other", `d.  Other: ${cafe.fsa.eligiblePersonsOther}`, { indent: 1 }));
+    p.push(checkboxLine(cafe.fsa.eligiblePersons === "participant_spouse_dep", "a.  Participant, spouse and Dependents. The Participant, his or her spouse and all Dependents, and any child (as defined in section 152(f)(1)) of the Participant until his or her 26th birthday.", { indent: 1 }));
+    p.push(checkboxLine(cafe.fsa.eligiblePersons === "covered_under_employer", "b.  Persons covered under Employer-sponsored group health plan. The Participant, his or her spouse and all Dependents, and any child (as defined in section 152(f)(1)) of the Participant until his or her 26th birthday, but only if such persons are also covered under an Employer-sponsored health plan.", { indent: 1 }));
+    p.push(checkboxLine(cafe.fsa.eligiblePersons === "participant_only", "c.  Participants only. No reimbursement for expenses incurred by the Participant's spouse or Dependents.", { indent: 1 }));
+    p.push(checkboxLine(
+      cafe.fsa.eligiblePersons === "other",
+      `d.  Other: ${cafe.fsa.eligiblePersonsOther} (may not include anyone other than the Participant, his or her spouse and all Dependents, and any child (as defined in section 152(f)(1)) of the Participant until his or her 26th birthday)`,
+      { indent: 1 }
+    ));
 
+    // ---- E.5 Expenses Not Eligible ----
+    p.push(subheading("Expenses Not Eligible for Reimbursement"));
+    p.push(body("5.  Expenses Not Eligible for Reimbursement. In addition to those listed in the Basic Plan Document, the following expenses are not eligible for reimbursement from a Participant's FSA:", { bold: true }));
+    p.push(checkboxLine(!!cafe.fsa.expensesNotEligibleHealth, `a.  Health Flexible Spending Account:  ${cafe.fsa.expensesNotEligibleHealth}`, { indent: 1 }));
+    p.push(checkboxLine(!!cafe.fsa.expensesNotEligibleLimited, `b.  Limited Purpose/Post-Deductible Health Flexible Spending Account (HSA-Compatible FSA):  ${cafe.fsa.expensesNotEligibleLimited}`, { indent: 1 }));
+    p.push(checkboxLine(!!cafe.fsa.expensesNotEligibleDcap, `c.  Dependent Care Assistance Plan Account:  ${cafe.fsa.expensesNotEligibleDcap}`, { indent: 1 }));
+    p.push(checkboxLine(!!cafe.fsa.expensesNotEligibleAdoption, `d.  Adoption Assistance Flexible Spending Account:  ${cafe.fsa.expensesNotEligibleAdoption}`, { indent: 1 }));
+
+    // ---- E.6 Adult Children Coverage ----
     p.push(body("6.  Adult Children Coverage. Reimbursement for adult children may be paid from the applicable FSA for claims incurred:", { bold: true }));
     p.push(checkboxLine(cafe.fsa.adultChildrenAge === "until_26", "a.  until the date the child attains age 26", { indent: 1 }));
     p.push(checkboxLine(cafe.fsa.adultChildrenAge === "until_end_of_year_26", "b.  until the last day of the calendar year in which the child attains age 26", { indent: 1 }));
 
+    // ---- E.7 Amounts Available for Reimbursement ----
+    p.push(subheading("Reimbursement"));
+    p.push(checkboxLine(
+      cafe.fsa.amountsAvailableDcap || cafe.fsa.amountsAvailableAdoption,
+      "7.  Amounts Available for Reimbursement. The Plan Administrator may direct reimbursement of FSAs up to the entire annual amount elected by the Eligible Employee on the Salary Reduction Agreement for the Plan Year for the applicable FSA, less any reimbursements already disbursed from the applicable FSA for the following Benefits:",
+      { indent: 0, bold: true }
+    ));
+    p.push(checkboxLine(cafe.fsa.amountsAvailableDcap, "a.  Dependent Care Assistance Plan Account", { indent: 1 }));
+    p.push(checkboxLine(cafe.fsa.amountsAvailableAdoption, "b.  Adoption Assistance Flexible Spending Account", { indent: 1 }));
+    p.push(noteText("If 7.a or 7.b is not selected, the Plan Administrator may direct reimbursement only up to the amount in the applicable FSA at the time the reimbursement request is received by the Plan Administrator."));
+
+    // ---- E.8 Grace Period ----
     p.push(subheading("Grace Period"));
-    p.push(body("8.  The Plan will reimburse claims incurred during a Grace Period immediately following the end of the Plan Year for the following Benefits:", { bold: true }));
+    p.push(checkboxLine(
+      cafe.fsa.gracePeriodHealthFSA || cafe.fsa.gracePeriodLimitedFSA || cafe.fsa.gracePeriodDcap || cafe.fsa.gracePeriodAdoption,
+      "8.  The Plan will reimburse claims incurred during a Grace Period immediately following the end of the Plan Year for the following Benefits.",
+      { indent: 0, bold: true }
+    ));
     if (features.healthFSA) p.push(checkboxLine(cafe.fsa.gracePeriodHealthFSA, "a.  Health Flexible Spending Account", { indent: 1 }));
     if (features.limitedPurposeFSA || features.postDeductibleFSA) p.push(checkboxLine(cafe.fsa.gracePeriodLimitedFSA, "b.  Limited Purpose/Post-Deductible Health Flexible Spending Account (HSA-Compatible FSA)", { indent: 1 }));
     if (features.dcap) p.push(checkboxLine(cafe.fsa.gracePeriodDcap, "c.  Dependent Care Assistance Plan Account", { indent: 1 }));
     if (features.adoptionAssistanceFSA) p.push(checkboxLine(cafe.fsa.gracePeriodAdoption, "d.  Adoption Assistance Flexible Spending Account", { indent: 1 }));
     p.push(noteText("The Plan cannot reimburse claims incurred during a Grace Period if carryovers are permitted in Part E.13."));
 
+    // ---- E.9 Last day of Grace Period ----
     p.push(body("9.  Last day of Grace Period:", { bold: true }));
     p.push(checkboxLine(cafe.fsa.gracePeriodEnd === "fifteenth_third_month", "a.  Fifteenth day of the 3rd month following end of the Plan Year", { indent: 1 }));
     p.push(checkboxLine(cafe.fsa.gracePeriodEnd === "other", `b.  Other  ${cafe.fsa.gracePeriodOther}`, { indent: 1 }));
 
+    // ---- E.10 Run Out Period (no Grace) ----
     p.push(subheading("Run Out Period"));
     p.push(body("10.  If no Grace Period applies for the Plan Year, an active Participant must submit claims for the Plan Year for reimbursement from the applicable FSA no later than:", { bold: true }));
     p.push(checkboxLine(!!cafe.fsa.runOutDays, `a.  ${cafe.fsa.runOutDays || "_____"} days after the end of the Plan Year`, { indent: 1 }));
     p.push(checkboxLine(!!cafe.fsa.runOutDate, `b.  ${cafe.fsa.runOutDate || "_____"} (insert date, e.g., March 31) immediately following such Plan Year`, { indent: 1 }));
 
+    // ---- E.11 Run Out Period (with Grace) ----
+    p.push(body("11.  If a Grace Period applies for the Plan Year, an active Participant must submit claims for the Plan Year for reimbursement from the applicable FSA no later than:", { bold: true }));
+    p.push(checkboxLine(!!cafe.fsa.runOutAfterGraceDays, `a.  ${cafe.fsa.runOutAfterGraceDays || "_____"} days after the end of the Grace Period`, { indent: 1 }));
+    p.push(checkboxLine(!!cafe.fsa.runOutAfterGraceDate, `b.  ${cafe.fsa.runOutAfterGraceDate || "_____"} (insert date, e.g., March 31st) immediately following such Plan Year`, { indent: 1 }));
+    p.push(noteText("The date in E.11b should be later than the last day of the Grace Period."));
+
+    // ---- E.12 Automatic Payment of Claims ----
+    p.push(subheading("Automatic Payment of Claims"));
+    p.push(body("12.  Eligible expenses not covered under the Employer-sponsored health plan (e.g., co-payments, co-insurance, deductibles) automatically paid from the applicable FSA.", { bold: true }));
+    if (features.healthFSA) p.push(checkboxLine(cafe.fsa.automaticPaymentHealthFSA, "a.  Health Flexible Spending Account", { indent: 1 }));
+    if (features.limitedPurposeFSA || features.postDeductibleFSA) p.push(checkboxLine(cafe.fsa.automaticPaymentLimitedFSA, "b.  Limited Purpose/Post-Deductible Health Flexible Spending Account (HSA-Compatible FSA)", { indent: 1 }));
+
+    // ---- E.13 Carryover ----
     if (features.healthFSA || features.limitedPurposeFSA || features.postDeductibleFSA) {
       p.push(subheading("Carryover"));
       p.push(body("13.  The Plan will carry over unused Health FSA balances at the end of the Plan Year for the following Benefits:", { bold: true }));
@@ -408,27 +508,31 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
           p.push(checkboxLine(cafe.fsa.carryoverLimitedFSAMode === "other", `ii.  Other:  ${cafe.fsa.carryoverLimitedFSAOther}`, { indent: 2 }));
         }
       }
-      p.push(noteText("If carryover is selected, the Plan may not provide for a Grace Period for the applicable FSA."));
+      p.push(noteText("If carryover is selected (E.13a or E.13b is selected for the applicable FSA), the Plan may not provide for a Grace Period for the applicable FSA and the Plan may not provide for a Grace Period for the applicable FSA in the Plan Year to which the carryover amount is applied."));
     }
 
+    // ---- E.14 Termination of Employment ----
     p.push(subheading("Termination of Employment"));
     p.push(body("14.  In the event of a Termination of Employment the Participant may elect to continue to make contributions to FSAs under the Plan on an after-tax basis and reimbursements will be allowed for the remainder of the Plan Year.", { bold: true }));
     p.push(checkboxLine(cafe.fsa.terminationContinuation === "yes", "a.  Yes", { indent: 1 }));
     p.push(checkboxLine(cafe.fsa.terminationContinuation === "yes_limited", `b.  Yes - subject to the following limitations:  ${cafe.fsa.terminationLimitations}`, { indent: 1 }));
     p.push(checkboxLine(cafe.fsa.terminationContinuation === "no", "c.  No", { indent: 1 }));
+    p.push(noteText("If E.14c is selected, then contributions shall cease upon Termination and reimbursements will be allowed only for expenses incurred prior to Termination."));
+    p.push(noteText("If applicable, any COBRA elections shall supersede this section."));
 
+    // ---- E.15 Claims after termination ----
     p.push(body("15.  In the event of a Termination of Employment, a Participant may submit claims for reimbursement from the applicable FSA no later than:", { bold: true }));
     p.push(checkboxLine(!!cafe.fsa.terminationClaimsDays, `a.  ${cafe.fsa.terminationClaimsDays || "_____"} days after a Termination of Employment.`, { indent: 1 }));
     p.push(checkboxLine(!!cafe.fsa.terminationClaimsAfterPlanYearDays, `b.  ${cafe.fsa.terminationClaimsAfterPlanYearDays || "_____"} days following the Plan Year in which the Termination occurs.`, { indent: 1 }));
+    p.push(noteText("If E.14a or E.14b is selected, then E.15b must be selected."));
 
+    // ---- E.16 Qualified Reservist Distributions ----
     if (features.healthFSA) {
       p.push(subheading("Qualified Reservist Distributions"));
-      p.push(checkboxLine(cafe.fsa.qualifiedReservistEnabled, "16.  Qualified Reservist Distributions are available for:", { indent: 0 }));
-      if (cafe.fsa.qualifiedReservistEnabled) {
-        p.push(checkboxLine(cafe.fsa.qualifiedReservistMode === "entire_amount", "a.  The entire amount elected for the applicable Health FSA for the Plan Year minus applicable Health FSA reimbursements received as of the date of the Qualified Reservist Distribution request.", { indent: 1 }));
-        p.push(checkboxLine(cafe.fsa.qualifiedReservistMode === "contributed_amount", "b.  The amount contributed to the applicable Health FSA as of the date of the Qualified Reservist Distribution request minus applicable FSA reimbursements received as of the date of the Qualified Reservist Distribution request.", { indent: 1 }));
-        p.push(checkboxLine(cafe.fsa.qualifiedReservistMode === "other", `c.  Other amount: ${cafe.fsa.qualifiedReservistOther}`, { indent: 1 }));
-      }
+      p.push(checkboxLine(cafe.fsa.qualifiedReservistEnabled, "16.  Qualified Reservist Distributions are available for:", { indent: 0, bold: true }));
+      p.push(checkboxLine(cafe.fsa.qualifiedReservistEnabled && cafe.fsa.qualifiedReservistMode === "entire_amount", "a.  The entire amount elected for the applicable Health FSA for the Plan Year minus applicable Health FSA reimbursements received as of the date of the Qualified Reservist Distribution request.", { indent: 1 }));
+      p.push(checkboxLine(cafe.fsa.qualifiedReservistEnabled && cafe.fsa.qualifiedReservistMode === "contributed_amount", "b.  The amount contributed to the applicable Health FSA as of the date of the Qualified Reservist Distribution request minus applicable FSA reimbursements received as of the date of the Qualified Reservist Distribution request.", { indent: 1 }));
+      p.push(checkboxLine(cafe.fsa.qualifiedReservistEnabled && cafe.fsa.qualifiedReservistMode === "other", `c.  Other amount (not to exceed the entire amount elected for the applicable Plan Year minus reimbursements):  ${cafe.fsa.qualifiedReservistOther}`, { indent: 1 }));
     }
   }
 
@@ -471,7 +575,8 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
     p.push(checkboxLine(fc.eligibleScope === "all_benefits", "a.  All Benefits offered under the Plan", { indent: 1 }));
     p.push(checkboxLine(fc.eligibleScope === "all_except", `b.  All Benefits offered under the Plan except the following:  ${fc.eligibleScopeExceptions}`, { indent: 1 }));
     p.push(checkboxLine(fc.eligibleScope === "only_following", `c.  Only the following Benefits:  ${fc.eligibleScopeOnly}`, { indent: 1 }));
-    p.push(checkboxLine(fc.eligibleScope === "premium_health_only", "d.  Only the portion of the Premium Conversion Account paid toward Employer-sponsored Health Contract premiums and/or Health FSA or HSA-Compatible Health FSA Benefits.", { indent: 1 }));
+    p.push(checkboxLine(fc.eligibleScope === "premium_health_only", "d.  Only the portion of the (i) Premium Conversion Account paid toward Employer-sponsored Health Contract premiums and/or (ii) Health FSA or HSA-Compatible Health FSA Benefits.", { indent: 1 }));
+    p.push(noteText("If G.1 is selected, G.2d must be selected."));
 
     p.push(body("3.  Amount of Flex Credit. The Employer will contribute a Flex Credit on behalf of each Eligible Employee as follows:", { bold: true }));
     p.push(checkboxLine(fc.amountMode === "dollar", `a.  $${fc.amountDollar || "_____"} per Eligible Employee`, { indent: 1 }));
@@ -479,15 +584,19 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
     p.push(checkboxLine(fc.amountMode === "other", `c.  Other:  ${fc.amountOther}`, { indent: 1 }));
     p.push(checkboxLine(fc.amountMode === "simple_cafeteria_match", "d.  The amount of the simple cafeteria plan contributions described in A.6b", { indent: 1 }));
 
-    p.push(checkboxLine(fc.contribTo401k, `4.  Contribution to 401(k) Plan. An Eligible Employee may elect to contribute all or a portion of his or her Flex Credits to a Qualified Plan in accordance with the terms of the following Qualified Plan(s):  ${fc.qualifiedPlanName}`, { indent: 0 }));
+    p.push(checkboxLine(fc.contribTo401k, `4.  Contribution to 401(k) Plan. An Eligible Employee may elect to contribute all or a portion of his or her Flex Credits to a Qualified Plan in accordance with the terms of the following Qualified Plan(s):  ${fc.qualifiedPlanName}`, { indent: 0, bold: true }));
+    p.push(noteText("If G.4 is selected, then G.5 (cash out) must also be elected."));
 
     p.push(subheading("Cash Outs"));
     p.push(body("5.  Cash Out of Flex Credits. A Participant may elect to receive all or a portion of his or Flex Credits in cash.", { bold: true }));
     p.push(checkboxLine(fc.cashOutAllowed === "yes", "a.  Yes", { indent: 1 }));
     p.push(checkboxLine(fc.cashOutAllowed === "yes_limited", `b.  Yes, subject to the following limitations:  ${fc.cashOutLimitations}`, { indent: 1 }));
     p.push(checkboxLine(fc.cashOutAllowed === "no", "c.  No", { indent: 1 }));
+    p.push(noteText("If G.5a or G.5b is selected, then Flex Credits a Participant elects to contribute to a Health FSA will count toward the Code section 125(i) contribution limitation."));
+    p.push(noteText("If G.1 is selected, G.5c must be selected."));
+    p.push(noteText("If G.5.c is selected, the maximum value of Flex Credits a Participant can contribute to a Health FSA for a Plan Year is $500."));
 
-    p.push(numberedLine("6", "Amount of Cash Out. For each Flex Credit dollar that a Participant elects to receive in cash from the Plan, the Participant will receive: $", fc.cashOutDollarValue));
+    p.push(numberedLine("6", "Amount of Cash Out. For each Flex Credit dollar that a Participant elects to receive in cash from the Plan, the Participant will receive: $", `${fc.cashOutDollarValue} (insert dollar value of each Flex Credit; if no amount is provided, the cash out value of each Flex Credit is $1.00)`));
 
     p.push(body("7.  Maximum Flex Credit Cash Out. The amount of cash a Participant may receive in exchange for Flex Credits in Plan Year shall not exceed:", { bold: true }));
     p.push(checkboxLine(fc.maxCashOut === "no_limit", "a.  No limit", { indent: 1 }));
@@ -512,6 +621,7 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
     p.push(checkboxLine(pto.maxPurchaseType === "days", `c.  ${pto.maxPurchaseAmount || "_____"} days`, { indent: 1 }));
     p.push(checkboxLine(pto.maxPurchaseType === "weeks", `d.  ${pto.maxPurchaseAmount || "_____"} weeks`, { indent: 1 }));
     p.push(checkboxLine(pto.maxPurchaseType === "other", `e.  Other:  ${pto.maxPurchaseOther}`, { indent: 1 }));
+    p.push(noteText("If Purchase of PTO is not a permitted Benefit in A.5i, H.1 is disregarded."));
 
     p.push(subheading("Sale of PTO"));
     p.push(body("2.  Maximum PTO Sale. A Participant can elect to sell no more than the following periods of PTO in a Plan Year:", { bold: true }));
@@ -520,9 +630,11 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
     p.push(checkboxLine(pto.maxSaleType === "days", `c.  ${pto.maxSaleAmount || "_____"} days`, { indent: 1 }));
     p.push(checkboxLine(pto.maxSaleType === "weeks", `d.  ${pto.maxSaleAmount || "_____"} weeks`, { indent: 1 }));
     p.push(checkboxLine(pto.maxSaleType === "other", `e.  Other:  ${pto.maxSaleOther}`, { indent: 1 }));
+    p.push(noteText("If Sale of PTO is not a permitted Benefit in A.5i, H.2 is disregarded."));
 
     p.push(subheading("Carryover of PTO"));
-    p.push(checkboxLine(pto.noCarryoverElectivePTO, "3.  No Carryover of Elective PTO. Unused elective PTO (determined as of the last day of the Plan Year) shall be paid in cash on or prior to the last day of the Plan Year.", { indent: 0 }));
+    p.push(checkboxLine(pto.noCarryoverElectivePTO, "3.  No Carryover of Elective PTO. Unused elective PTO (determined as of the last day of the Plan Year) shall be paid in cash on or prior to the last day of the Plan Year.", { indent: 0, bold: true }));
+    p.push(noteText("If Sale and/or Purchase of PTO are not permitted Benefits in A.5i, H.3 is disregarded."));
     p.push(noteText("If H.3 is not selected, unused elective PTO will be forfeited as of the last day of the Plan Year."));
   }
 
