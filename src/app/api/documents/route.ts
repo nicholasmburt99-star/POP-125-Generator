@@ -1,14 +1,9 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { generateAllDocuments } from "@/lib/documents/generator";
+import { getOrCreateDefaultUser } from "@/lib/default-user";
 
 export async function GET() {
-  const session = await auth();
-  if (!session?.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const documents = await prisma.documentSet.findMany({
     orderBy: { createdAt: "desc" },
     include: { createdBy: { select: { name: true, email: true } } },
@@ -18,22 +13,11 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user?.email) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-  });
-  if (!user) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
-  }
+  const user = await getOrCreateDefaultUser();
 
   try {
     const formData = await request.json();
 
-    // Create document set record
     const docSet = await prisma.documentSet.create({
       data: {
         createdById: user.id,
@@ -44,7 +28,6 @@ export async function POST(request: Request) {
       },
     });
 
-    // Generate documents
     try {
       const { docxUrl, pdfUrl } = await generateAllDocuments(formData, docSet.id);
 

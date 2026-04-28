@@ -1,24 +1,17 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { generateAllDocuments } from "@/lib/documents/generator";
 import { del } from "@vercel/blob";
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const { id } = await params;
   const doc = await prisma.documentSet.findUnique({ where: { id } });
   if (!doc) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
-
   return NextResponse.json(doc);
 }
 
@@ -27,16 +20,10 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user?.email) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const { id } = await params;
   const formData = await request.json();
 
   try {
-    // Update the record to generating status
     await prisma.documentSet.update({
       where: { id },
       data: {
@@ -47,7 +34,6 @@ export async function PUT(
       },
     });
 
-    // Regenerate documents
     const { docxUrl, pdfUrl } = await generateAllDocuments(formData, id);
 
     const updated = await prisma.documentSet.update({
@@ -78,14 +64,9 @@ export async function PUT(
 
 // DELETE: remove document set and its blob files
 export async function DELETE(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const { id } = await params;
 
   const doc = await prisma.documentSet.findUnique({ where: { id } });
@@ -94,13 +75,10 @@ export async function DELETE(
   }
 
   try {
-    // Delete blob files if they exist
     const blobUrls = [doc.docxBlobUrl, doc.pdfBlobUrl].filter(Boolean) as string[];
     if (blobUrls.length > 0) {
       await del(blobUrls);
     }
-
-    // Delete the database record
     await prisma.documentSet.delete({ where: { id } });
 
     return NextResponse.json({ success: true });

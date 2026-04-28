@@ -2,12 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
-import { FileText, Plus, LogOut, User } from "lucide-react";
+import { FileText, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
-export function Sidebar({ userName }: { userName: string }) {
+export function Sidebar() {
   const pathname = usePathname();
 
   return (
@@ -37,21 +35,6 @@ export function Sidebar({ userName }: { userName: string }) {
           </Button>
         </Link>
       </nav>
-
-      <div className="border-t p-3 space-y-2">
-        <div className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600">
-          <User className="h-4 w-4" />
-          <span className="truncate">{userName}</span>
-        </div>
-        <Button
-          variant="ghost"
-          className="w-full justify-start gap-2 text-gray-500"
-          onClick={() => signOut({ callbackUrl: "/login" })}
-        >
-          <LogOut className="h-4 w-4" />
-          Sign Out
-        </Button>
-      </div>
     </div>
   );
 }
