@@ -3,6 +3,7 @@ import type { FormData } from "@/types";
 import { buildDocx } from "./docx/docx-builder";
 import { buildPlanDocumentParagraphs } from "./docx/plan-document";
 import { buildSPDParagraphs } from "./docx/spd";
+import { buildCafeteriaPlanParagraphs } from "./docx/cafeteria-plan";
 import {
   buildElectionToParticipateParagraphs,
   buildElectionToNotParticipateParagraphs,
@@ -12,6 +13,7 @@ import {
 import { createPDF, type PDFSection } from "./pdf/pdf-builder";
 import { buildPlanDocumentPDFSections } from "./pdf/plan-document";
 import { buildSPDPDFSections } from "./pdf/spd";
+import { buildCafeteriaPlanPDFSections } from "./pdf/cafeteria-plan";
 import {
   buildElectionToParticipatePDF,
   buildElectionToNotParticipatePDF,
@@ -33,14 +35,18 @@ export async function generateAllDocuments(
     .replace(/_+/g, "_")
     .substring(0, 40);
 
-  // --- DOCX ---
-  const planDocParagraphs = buildPlanDocumentParagraphs(formData);
-  const spdParagraphs = buildSPDParagraphs(formData);
+  const isCafeteria = formData.plan.planType === "cafeteria";
+  const planLabelForFile = isCafeteria ? "Cafeteria_Plan" : "Premium_Only_Plan";
 
-  const docxSections: { paragraphs: typeof planDocParagraphs }[] = [
-    { paragraphs: planDocParagraphs },
-    { paragraphs: spdParagraphs },
-  ];
+  // --- DOCX ---
+  const docxSections: { paragraphs: ReturnType<typeof buildPlanDocumentParagraphs> }[] = [];
+
+  if (isCafeteria) {
+    docxSections.push({ paragraphs: buildCafeteriaPlanParagraphs(formData) });
+  } else {
+    docxSections.push({ paragraphs: buildPlanDocumentParagraphs(formData) });
+    docxSections.push({ paragraphs: buildSPDParagraphs(formData) });
+  }
 
   if (formData.elections.includeElectionForms) {
     docxSections.push({ paragraphs: buildElectionToParticipateParagraphs(formData) });
@@ -52,10 +58,14 @@ export async function generateAllDocuments(
   const docxBuffer = await buildDocx(docxSections);
 
   // --- PDF ---
-  const pdfSections: PDFSection[] = [
-    ...buildPlanDocumentPDFSections(formData),
-    ...buildSPDPDFSections(formData),
-  ];
+  const pdfSections: PDFSection[] = [];
+
+  if (isCafeteria) {
+    pdfSections.push(...buildCafeteriaPlanPDFSections(formData));
+  } else {
+    pdfSections.push(...buildPlanDocumentPDFSections(formData));
+    pdfSections.push(...buildSPDPDFSections(formData));
+  }
 
   if (formData.elections.includeElectionForms) {
     pdfSections.push(buildElectionToParticipatePDF(formData));
@@ -69,8 +79,8 @@ export async function generateAllDocuments(
   // --- Upload to Vercel Blob ---
   // Use timestamp to bust CDN cache on regeneration
   const ts = Date.now();
-  const docxFilename = `${docSetId}/${employerSlug}_Premium_Only_Plan_${ts}.docx`;
-  const pdfFilename = `${docSetId}/${employerSlug}_Premium_Only_Plan_${ts}.pdf`;
+  const docxFilename = `${docSetId}/${employerSlug}_${planLabelForFile}_${ts}.docx`;
+  const pdfFilename = `${docSetId}/${employerSlug}_${planLabelForFile}_${ts}.pdf`;
 
   const [docxBlob, pdfBlob] = await Promise.all([
     put(docxFilename, docxBuffer, {

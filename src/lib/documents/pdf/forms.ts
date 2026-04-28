@@ -1,19 +1,21 @@
 import type { FormData } from "@/types";
 import type { PDFSection } from "./pdf-builder";
 import { formHeader, bodyText, bulletItem, checkboxItem, dualSignatureBlock, emptyLine } from "./pdf-builder";
-import { formatMonthDay, benefitsList } from "../helpers";
+import { formatMonthDay, electionFormBenefits, planTypeLabelShort, planTypeLabelFull } from "../helpers";
 
 export function buildElectionToParticipatePDF(data: FormData): PDFSection {
   const name = data.employer.legalBusinessName;
   const pyStart = formatMonthDay(data.plan.planYearStart);
   const pyEnd = formatMonthDay(data.plan.planYearEnd);
-  const benefits = benefitsList(data.benefits);
+  const benefits = electionFormBenefits(data);
+  const shortLabel = planTypeLabelShort(data);
+  const fullLabel = planTypeLabelFull(data);
 
   return { build: (ctx) => {
-    formHeader(ctx, name, "Election to Participate", pyStart, pyEnd);
+    formHeader(ctx, name, "Election to Participate", pyStart, pyEnd, fullLabel);
     bodyText(ctx, "As an eligible employee, I acknowledge that I have received and understand the Summary Plan Description.");
     emptyLine(ctx);
-    bodyText(ctx, "I elect to receive the following coverage(s) under the Premium Only Plan:");
+    bodyText(ctx, `I elect to receive the following coverage(s) under the ${shortLabel}:`);
     emptyLine(ctx);
     benefits.forEach((b) => checkboxItem(ctx, b, { bold: true }));
     emptyLine(ctx);
@@ -32,12 +34,14 @@ export function buildElectionToNotParticipatePDF(data: FormData): PDFSection {
   const name = data.employer.legalBusinessName;
   const pyStart = formatMonthDay(data.plan.planYearStart);
   const pyEnd = formatMonthDay(data.plan.planYearEnd);
+  const shortLabel = planTypeLabelShort(data);
+  const fullLabel = planTypeLabelFull(data);
 
   return { build: (ctx) => {
-    formHeader(ctx, name, "Election to not Participate", pyStart, pyEnd);
-    bodyText(ctx, "I understand all benefit options available under the Premium Only Plan.");
+    formHeader(ctx, name, "Election to not Participate", pyStart, pyEnd, fullLabel);
+    bodyText(ctx, `I understand all benefit options available under the ${shortLabel}.`);
     emptyLine(ctx);
-    bodyText(ctx, "I elect NOT to participate and instead receive my full compensation in taxable compensation.");
+    bodyText(ctx, `I elect NOT to participate in the ${shortLabel} and instead receive my full compensation in taxable compensation.`);
     emptyLine(ctx);
     bodyText(ctx, "I understand that:", { bold: true });
     bulletItem(ctx, "I cannot change elections unless I have a qualifying change in status.");
@@ -50,11 +54,13 @@ export function buildRevocationFormPDF(data: FormData): PDFSection {
   const name = data.employer.legalBusinessName;
   const pyStart = formatMonthDay(data.plan.planYearStart);
   const pyEnd = formatMonthDay(data.plan.planYearEnd);
-  const benefits = benefitsList(data.benefits);
+  const benefits = electionFormBenefits(data);
+  const shortLabel = planTypeLabelShort(data);
+  const fullLabel = planTypeLabelFull(data);
 
   return { build: (ctx) => {
-    formHeader(ctx, name, "Revocation of Benefit Election Form", pyStart, pyEnd);
-    bodyText(ctx, "Effective____________, I hereby revoke my benefit election with respect to the following:");
+    formHeader(ctx, name, "Revocation of Benefit Election Form", pyStart, pyEnd, fullLabel);
+    bodyText(ctx, `Effective____________, I hereby revoke my benefit election under the ${shortLabel} with respect to the following:`);
     emptyLine(ctx);
     benefits.forEach((b) => checkboxItem(ctx, b, { bold: true }));
     emptyLine(ctx);
@@ -69,6 +75,8 @@ export function buildChangeInStatusFormPDF(data: FormData): PDFSection {
   const name = data.employer.legalBusinessName;
   const pyStart = formatMonthDay(data.plan.planYearStart);
   const pyEnd = formatMonthDay(data.plan.planYearEnd);
+  const shortLabel = planTypeLabelShort(data);
+  const fullLabel = planTypeLabelFull(data);
 
   const reasons = [
     "Marriage", "Divorce, Legal Separation, or Annulment",
@@ -90,8 +98,8 @@ export function buildChangeInStatusFormPDF(data: FormData): PDFSection {
   }
 
   return { build: (ctx) => {
-    formHeader(ctx, name, "Change in Status Election Form", pyStart, pyEnd);
-    bodyText(ctx, "As a participant, I am entitled to revoke my prior election due to a change in status.");
+    formHeader(ctx, name, "Change in Status Election Form", pyStart, pyEnd, fullLabel);
+    bodyText(ctx, `As a participant in the ${shortLabel}, I am entitled to revoke my prior election due to a change in status.`);
     emptyLine(ctx);
     bodyText(ctx, "I certify that I have incurred the following change in status:", { bold: true });
     emptyLine(ctx);

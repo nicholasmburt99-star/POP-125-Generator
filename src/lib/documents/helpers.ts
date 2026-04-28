@@ -62,3 +62,34 @@ export function planYearDescription(data: FormData): string {
   const end = formatMonthDay(data.plan.planYearEnd);
   return `${start} through ${end}`;
 }
+
+// Returns "Premium Only Plan" or "Cafeteria Plan" depending on planType
+export function planTypeLabelShort(data: FormData): string {
+  return data.plan.planType === "cafeteria" ? "Cafeteria Plan" : "Premium Only Plan";
+}
+
+// Full Section 125 label used in form headers
+export function planTypeLabelFull(data: FormData): string {
+  return `Section 125 ${planTypeLabelShort(data)}`;
+}
+
+// Returns the list of benefits to show in election forms.
+// For POP plans, uses the simple benefits list (medical/dental/vision).
+// For cafeteria plans, includes all enabled cafeteria benefits.
+export function electionFormBenefits(data: FormData): string[] {
+  if (data.plan.planType !== "cafeteria" || !data.cafeteria) {
+    return benefitsList(data.benefits);
+  }
+  const list: string[] = [];
+  const f = data.cafeteria.features;
+  if (f.premiumConversion) list.push("Premium Conversion (Group Medical / Dental / Vision premiums)");
+  if (f.healthFSA) list.push("Health Flexible Spending Account");
+  if (f.limitedPurposeFSA) list.push("Limited Purpose HSA-Compatible Health FSA");
+  if (f.postDeductibleFSA) list.push("Post-Deductible HSA-Compatible Health FSA");
+  if (f.dcap) list.push("Dependent Care Assistance Plan Account (DCAP)");
+  if (f.adoptionAssistanceFSA) list.push("Adoption Assistance Flexible Spending Account");
+  if (f.hsa) list.push("Health Savings Account");
+  if (f.flexCredits) list.push("Flexible Benefit Credits");
+  if (f.ptoPurchaseSale) list.push("PTO Purchase / Sale");
+  return list;
+}

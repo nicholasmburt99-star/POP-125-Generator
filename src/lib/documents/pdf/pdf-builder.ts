@@ -192,11 +192,11 @@ export function dualSignatureBlock(ctx: PDFContext) {
   ctx.page.drawText("Employer\u2019s Authorized Representative                                      Date", { x: MARGIN, y: ctx.y, size: FONT_SIZE, font: ctx.font });
 }
 
-export function formHeader(ctx: PDFContext, companyName: string, formTitle: string, pyStart: string, pyEnd: string) {
+export function formHeader(ctx: PDFContext, companyName: string, formTitle: string, pyStart: string, pyEnd: string, planTypeLabel: string = "Section 125 Premium Only Plan") {
   drawCentered(ctx, formTitle, HEADING_SIZE, true);
   ctx.y -= 16;
   bodyText(ctx, `For ${companyName}`, { bold: true });
-  bodyText(ctx, "Section 125 Premium Only Plan");
+  bodyText(ctx, planTypeLabel);
   bodyText(ctx, `Plan Year ${pyStart} through ${pyEnd}`, { bold: true });
   ctx.y -= 8;
   ctx.page.drawText("Employee Name  ________________________          Employee Number  ____________", { x: MARGIN, y: ctx.y, size: FONT_SIZE, font: ctx.fontBold });
@@ -225,6 +225,104 @@ function drawLabelLine(ctx: PDFContext, label: string) {
     font: ctx.font,
   });
   ctx.y -= LINE_HEIGHT;
+}
+
+// --- Cafeteria Adoption Agreement helpers ---
+
+export function checkboxLine(ctx: PDFContext, checked: boolean, text: string, opts?: { indent?: number; bold?: boolean }) {
+  ctx.ensureSpace(LINE_HEIGHT + 2);
+  const indent = opts?.indent ?? 0;
+  const startX = MARGIN + 18 + indent * 18;
+  const f = opts?.bold || checked ? ctx.fontBold : ctx.font;
+  const prefix = checked ? "[X] " : "[  ] ";
+  ctx.page.drawText(prefix, { x: startX, y: ctx.y, size: FONT_SIZE, font: ctx.fontBold });
+  const prefixWidth = ctx.fontBold.widthOfTextAtSize(prefix, FONT_SIZE);
+  drawWrappedAt(ctx, text, FONT_SIZE, f, startX + prefixWidth, CONTENT_WIDTH - (startX + prefixWidth - MARGIN));
+  ctx.y -= 2;
+}
+
+export function numberedLine(ctx: PDFContext, number: string, label: string, value: string, opts?: { indent?: number }) {
+  ctx.ensureSpace(LINE_HEIGHT + 2);
+  const indent = opts?.indent ?? 0;
+  const startX = MARGIN + indent * 18;
+  ctx.page.drawText(`${number}. `, { x: startX, y: ctx.y, size: FONT_SIZE, font: ctx.fontBold });
+  const numWidth = ctx.fontBold.widthOfTextAtSize(`${number}. `, FONT_SIZE);
+  const labelText = `${label}${value ? ":" : ""} `;
+  ctx.page.drawText(labelText, { x: startX + numWidth, y: ctx.y, size: FONT_SIZE, font: ctx.font });
+  const labelWidth = ctx.font.widthOfTextAtSize(labelText, FONT_SIZE);
+  if (value) {
+    drawWrappedAt(ctx, value, FONT_SIZE, ctx.fontBold, startX + numWidth + labelWidth, CONTENT_WIDTH - (startX + numWidth + labelWidth - MARGIN));
+  } else {
+    ctx.y -= LINE_HEIGHT;
+  }
+  ctx.y -= 2;
+}
+
+export function legalSection(ctx: PDFContext, letter: string, title: string) {
+  ctx.ensureSpace(40);
+  ctx.y -= 12;
+  const text = `${letter}.  ${title.toUpperCase()}`;
+  ctx.page.drawText(text, { x: MARGIN, y: ctx.y, size: FONT_SIZE, font: ctx.fontBold });
+  const w = ctx.fontBold.widthOfTextAtSize(text, FONT_SIZE);
+  ctx.page.drawLine({
+    start: { x: MARGIN, y: ctx.y - 2 },
+    end: { x: MARGIN + w, y: ctx.y - 2 },
+    thickness: 0.5,
+    color: rgb(0, 0, 0),
+  });
+  ctx.y -= LINE_HEIGHT + 6;
+}
+
+export function subheading(ctx: PDFContext, text: string) {
+  ctx.ensureSpace(LINE_HEIGHT + 4);
+  ctx.y -= 4;
+  ctx.page.drawText(text, { x: MARGIN, y: ctx.y, size: FONT_SIZE, font: ctx.fontBold });
+  ctx.y -= LINE_HEIGHT + 2;
+}
+
+export function noteText(ctx: PDFContext, text: string) {
+  ctx.ensureSpace(LINE_HEIGHT);
+  drawWrappedAt(ctx, `NOTE: ${text}`, FONT_SIZE - 1, ctx.font, MARGIN + 18, CONTENT_WIDTH - 18);
+  ctx.y -= 2;
+}
+
+export function centered(ctx: PDFContext, text: string, size: number, bold = false) {
+  ctx.ensureSpace(size * 1.4);
+  const f = bold ? ctx.fontBold : ctx.font;
+  const w = f.widthOfTextAtSize(text, size);
+  const x = (PAGE_WIDTH - w) / 2;
+  ctx.page.drawText(text, { x, y: ctx.y, size, font: f });
+  ctx.y -= size * 1.4;
+}
+
+function drawWrappedAt(ctx: PDFContext, text: string, size: number, font: PDFFont, startX: number, maxWidth: number) {
+  const words = text.split(" ");
+  let line = "";
+  let x = startX;
+  let firstLine = true;
+
+  for (const word of words) {
+    const testLine = line ? `${line} ${word}` : word;
+    const testWidth = font.widthOfTextAtSize(testLine, size);
+    const available = firstLine ? maxWidth : CONTENT_WIDTH;
+
+    if (testWidth > available && line) {
+      ctx.ensureSpace(LINE_HEIGHT);
+      ctx.page.drawText(line, { x, y: ctx.y, size, font });
+      ctx.y -= LINE_HEIGHT;
+      line = word;
+      x = MARGIN;
+      firstLine = false;
+    } else {
+      line = testLine;
+    }
+  }
+
+  if (line) {
+    ctx.ensureSpace(LINE_HEIGHT);
+    ctx.page.drawText(line, { x, y: ctx.y, size, font });
+    ctx.y -= LINE_HEIGHT;
+  }
 }
 
 function drawWrapped(ctx: PDFContext, text: string, size: number, bold: boolean | undefined, startX: number, maxWidth: number) {
