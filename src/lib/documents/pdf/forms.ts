@@ -13,14 +13,22 @@ export function buildElectionToParticipatePDF(data: FormData): PDFSection {
 
   return { build: (ctx) => {
     formHeader(ctx, name, "Election to Participate", pyStart, pyEnd, fullLabel);
-    bodyText(ctx, "As an eligible employee, I acknowledge that I have received and understand the Summary Plan Description.");
+    bodyText(ctx, "As an eligible employee, I acknowledge that I have received and read the Summary Plan Description and understand the benefits available to me and the other rights and obligations I have under the Plan.");
     emptyLine(ctx);
-    bodyText(ctx, `I elect to receive the following coverage(s) under the ${shortLabel}:`);
+    bodyText(ctx, "Coverage Tier (check one):", { bold: true });
+    checkboxItem(ctx, "Employee Only");
+    checkboxItem(ctx, "Employee + Spouse");
+    checkboxItem(ctx, "Employee + Child(ren)");
+    checkboxItem(ctx, "Family");
     emptyLine(ctx);
-    benefits.forEach((b) => checkboxItem(ctx, b, { bold: true }));
+    bodyText(ctx, `I elect to receive the following coverage(s) under the ${shortLabel} and authorize the per-pay-period salary redirection amount indicated for each:`, { bold: true });
+    emptyLine(ctx);
+    benefits.forEach((b) => checkboxItem(ctx, `${b}    Per Pay Period: $______________`, { bold: true }));
+    emptyLine(ctx);
+    bodyText(ctx, "Total per-pay-period salary redirection: $______________");
     emptyLine(ctx);
     bodyText(ctx, "I understand that:", { bold: true });
-    bulletItem(ctx, "I authorize salary redirections in the amounts of the current premiums.");
+    bulletItem(ctx, "If I do not specify dollar amounts above, I authorize salary redirections in the amounts of the current premiums for the coverage(s) and tier elected.");
     bulletItem(ctx, "If premiums change, my redirection will automatically adjust.");
     bulletItem(ctx, "I cannot change elections unless I have a qualifying change in status.");
     bulletItem(ctx, "Unused amounts will be forfeited.");
