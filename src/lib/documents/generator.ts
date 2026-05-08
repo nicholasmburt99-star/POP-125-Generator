@@ -4,9 +4,10 @@ import { buildDocx } from "./docx/docx-builder";
 import { buildPlanDocumentParagraphs } from "./docx/plan-document";
 import { buildSPDParagraphs } from "./docx/spd";
 import { buildCafeteriaPlanParagraphs } from "./docx/cafeteria-plan";
+import { buildCafeteriaSPDParagraphs } from "./docx/cafeteria-spd";
 import {
   buildElectionToParticipateParagraphs,
-  buildElectionToNotParticipateParagraphs,
+  buildWaiverOfParticipationParagraphs,
   buildRevocationFormParagraphs,
   buildChangeInStatusFormParagraphs,
 } from "./docx/forms";
@@ -14,9 +15,10 @@ import { createPDF, type PDFSection } from "./pdf/pdf-builder";
 import { buildPlanDocumentPDFSections } from "./pdf/plan-document";
 import { buildSPDPDFSections } from "./pdf/spd";
 import { buildCafeteriaPlanPDFSections } from "./pdf/cafeteria-plan";
+import { buildCafeteriaSPDPDFSections } from "./pdf/cafeteria-spd";
 import {
   buildElectionToParticipatePDF,
-  buildElectionToNotParticipatePDF,
+  buildWaiverOfParticipationPDF,
   buildRevocationFormPDF,
   buildChangeInStatusFormPDF,
 } from "./pdf/forms";
@@ -43,6 +45,7 @@ export async function generateAllDocuments(
 
   if (isCafeteria) {
     docxSections.push({ paragraphs: buildCafeteriaPlanParagraphs(formData) });
+    docxSections.push({ paragraphs: buildCafeteriaSPDParagraphs(formData) });
   } else {
     docxSections.push({ paragraphs: buildPlanDocumentParagraphs(formData) });
     docxSections.push({ paragraphs: buildSPDParagraphs(formData) });
@@ -50,7 +53,7 @@ export async function generateAllDocuments(
 
   if (formData.elections.includeElectionForms) {
     docxSections.push({ paragraphs: buildElectionToParticipateParagraphs(formData) });
-    docxSections.push({ paragraphs: buildElectionToNotParticipateParagraphs(formData) });
+    docxSections.push({ paragraphs: buildWaiverOfParticipationParagraphs(formData) });
     docxSections.push({ paragraphs: buildRevocationFormParagraphs(formData) });
     docxSections.push({ paragraphs: buildChangeInStatusFormParagraphs(formData) });
   }
@@ -62,6 +65,7 @@ export async function generateAllDocuments(
 
   if (isCafeteria) {
     pdfSections.push(...buildCafeteriaPlanPDFSections(formData));
+    pdfSections.push(...buildCafeteriaSPDPDFSections(formData));
   } else {
     pdfSections.push(...buildPlanDocumentPDFSections(formData));
     pdfSections.push(...buildSPDPDFSections(formData));
@@ -69,7 +73,7 @@ export async function generateAllDocuments(
 
   if (formData.elections.includeElectionForms) {
     pdfSections.push(buildElectionToParticipatePDF(formData));
-    pdfSections.push(buildElectionToNotParticipatePDF(formData));
+    pdfSections.push(buildWaiverOfParticipationPDF(formData));
     pdfSections.push(buildRevocationFormPDF(formData));
     pdfSections.push(buildChangeInStatusFormPDF(formData));
   }

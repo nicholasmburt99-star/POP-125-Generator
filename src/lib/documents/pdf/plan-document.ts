@@ -5,6 +5,9 @@ import {
   bodyText, bulletItem, signatureBlock, emptyLine,
 } from "./pdf-builder";
 import { formatDate, formatMonthDay, stateName, entityLabel, benefitsList } from "../helpers";
+import { getCobraPDFBuilder } from "../legal-text/cobra";
+import { getFmlaUserraPDFBuilder } from "../legal-text/fmla-userra";
+import { getQmcsoPDFBuilder } from "../legal-text/qmcso";
 
 export function buildPlanDocumentPDFSections(data: FormData): PDFSection[] {
   const name = data.employer.legalBusinessName;
@@ -33,6 +36,9 @@ export function buildPlanDocumentPDFSections(data: FormData): PDFSection[] {
       bodyText(ctx, "VI. Article - Administration");
       bodyText(ctx, "VII. Article - Amendment or Termination of Plan");
       bodyText(ctx, "VIII. Article - Miscellaneous");
+      bodyText(ctx, "IX. Article - COBRA Continuation of Coverage");
+      bodyText(ctx, "X. Article - FMLA and USERRA Continuation of Coverage");
+      bodyText(ctx, "XI. Article - Qualified Medical Child Support Orders");
     }},
 
     // Introduction + Article I
@@ -217,18 +223,23 @@ export function buildPlanDocumentPDFSections(data: FormData): PDFSection[] {
       sectionTitle(ctx, "13. Captions");
       bodyText(ctx, "The captions contained herein are inserted only as a matter of convenience and for reference, and in no way define, limit, enlarge, or describe the scope or intent of the Plan.");
       sectionTitle(ctx, "14. Continuation of Coverage");
-      bodyText(ctx, "Notwithstanding anything in the Plan to the contrary, in the event any benefit under this Plan subject to the continuation coverage requirement of Code Section 4980B becomes unavailable, each Participant will be entitled to continuation coverage as prescribed in Code Section 4980B.");
+      bodyText(ctx, "Notwithstanding anything in the Plan to the contrary, in the event any benefit under this Plan subject to the continuation coverage requirement of Code Section 4980B becomes unavailable, each Participant will be entitled to continuation coverage as prescribed in Code Section 4980B. The detailed COBRA continuation provisions, FMLA and USERRA continuation provisions, and Qualified Medical Child Support Order procedures are set forth in the Articles titled “COBRA Continuation of Coverage,” “FMLA and USERRA Continuation of Coverage,” and “Qualified Medical Child Support Orders” below.");
       sectionTitle(ctx, "15. Health Insurance Portability and Accountability Act");
       bodyText(ctx, "Notwithstanding anything in this Plan to the contrary, this Plan shall be operated in accordance with HIPAA and regulations thereunder.");
       sectionTitle(ctx, "16. Uniformed Services Employment and Reemployment Rights Act");
       bodyText(ctx, "Notwithstanding any provision of this Plan to the contrary, contributions, benefits and service credit with respect to qualified military service shall be provided in accordance with USERRA and the regulations thereunder.");
       sectionTitle(ctx, "17. Genetic Information Nondiscrimination Act");
       bodyText(ctx, "Notwithstanding any provision of this Plan to the contrary, this Plan shall be operated in accordance with GINA and regulations thereunder.");
-      if (data.elections.includeFmlaLanguage) {
-        sectionTitle(ctx, "18. Family and Medical Leave Act");
-        bodyText(ctx, "A Participant who takes an unpaid leave of absence under FMLA may revoke his or her election at the beginning of or during the leave. Such a revocation is binding for the balance of the Plan Year. If a Participant chooses to continue coverage during FMLA leave, the Plan Administrator shall select among: (a) Pre-payment before the leave; (b) Payment during the leave on the same schedule; or (c) Advancement by the Employer of required payments.");
-      }
     }},
+
+    // Article IX - COBRA
+    { build: (ctx) => getCobraPDFBuilder(ctx) },
+
+    // Article X - FMLA and USERRA
+    { build: (ctx) => getFmlaUserraPDFBuilder(ctx) },
+
+    // Article XI - QMCSO
+    { build: (ctx) => getQmcsoPDFBuilder(ctx) },
 
     // Adoption Agreement
     { build: (ctx) => {

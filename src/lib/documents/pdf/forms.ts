@@ -30,22 +30,21 @@ export function buildElectionToParticipatePDF(data: FormData): PDFSection {
   }};
 }
 
-export function buildElectionToNotParticipatePDF(data: FormData): PDFSection {
+export function buildWaiverOfParticipationPDF(data: FormData): PDFSection {
   const name = data.employer.legalBusinessName;
   const pyStart = formatMonthDay(data.plan.planYearStart);
   const pyEnd = formatMonthDay(data.plan.planYearEnd);
   const shortLabel = planTypeLabelShort(data);
   const fullLabel = planTypeLabelFull(data);
+  const planName = `${name} ${shortLabel}`;
 
   return { build: (ctx) => {
-    formHeader(ctx, name, "Election to not Participate", pyStart, pyEnd, fullLabel);
-    bodyText(ctx, `I understand all benefit options available under the ${shortLabel}.`);
+    formHeader(ctx, name, "Waiver of Participation", pyStart, pyEnd, fullLabel);
+    bodyText(ctx, `To be completed if any eligible employee is declining coverage under the ${planName}.`);
     emptyLine(ctx);
-    bodyText(ctx, `I elect NOT to participate in the ${shortLabel} and instead receive my full compensation in taxable compensation.`);
+    bodyText(ctx, `I, ______________________________, elect to waive coverage under the ${planName} at this time. I understand that my decision is for the length of the plan year, and only in the event of a life change would I be eligible to change my election prior to the next plan year.`);
     emptyLine(ctx);
-    bodyText(ctx, "I understand that:", { bold: true });
-    bulletItem(ctx, "I cannot change elections unless I have a qualifying change in status.");
-    bulletItem(ctx, "Prior to each Plan Year I will be offered the opportunity to change my election.");
+    bodyText(ctx, "I have read and I understand the Summary Plan Description and the related Adoption Agreement, which were provided to me by my employer. I have been given the opportunity to apply for the available benefits and have elected not to enroll.");
     dualSignatureBlock(ctx);
   }};
 }

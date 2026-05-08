@@ -2,6 +2,7 @@ import type { FormData } from "@/types";
 import type { PDFSection } from "./pdf-builder";
 import { coverPage, articleHeading, sectionTitle, bodyText, bulletItem, emptyLine } from "./pdf-builder";
 import { formatDate, formatMonthDay, benefitsList } from "../helpers";
+import { getErisaRightsPDFBuilder } from "../legal-text/erisa-rights";
 
 export function buildSPDPDFSections(data: FormData): PDFSection[] {
   const name = data.employer.legalBusinessName;
@@ -58,6 +59,11 @@ export function buildSPDPDFSections(data: FormData): PDFSection[] {
       bodyText(ctx, "Your Social Security benefits may be slightly reduced due to pre-tax contributions.");
       sectionTitle(ctx, "08. Termination of Employment");
       bodyText(ctx, "You remain covered only for the period for which premiums have been paid. Unused amounts are forfeited.");
+      sectionTitle(ctx, "09. Qualified Medical Child Support Order");
+      bodyText(ctx, "A medical child support order is a judgment, decree or order made under state law that provides for child support or health coverage for the child of a Participant. You may obtain, without charge, a copy of the procedures governing the determination of qualified medical child support orders from the Plan Administrator.");
+      sectionTitle(ctx, "10. What Are My Rights to Continue Coverage Under COBRA?");
+      bodyText(ctx, "If the Employer normally employs 20 or more employees on a typical business day during the preceding calendar year and group health plan benefits have been selected, you, your spouse, and your dependent children may have the right to continue group health coverage under the Consolidated Omnibus Budget Reconciliation Act of 1985, as amended (“COBRA”) following a qualifying event such as termination of employment, reduction in hours, divorce or legal separation, death of the covered employee, the covered employee’s entitlement to Medicare, or a dependent child ceasing to be a dependent under the Plan. The detailed COBRA continuation provisions are set forth in the Plan Document. You may obtain a copy of the Plan Document from the Plan Administrator without charge.");
     }},
+    { build: (ctx) => getErisaRightsPDFBuilder(ctx) },
   ];
 }

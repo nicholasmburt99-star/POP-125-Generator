@@ -16,6 +16,7 @@ import {
   formatMonthDay,
   benefitsList,
 } from "../helpers";
+import { getErisaRightsDocxParagraphs } from "../legal-text/erisa-rights";
 
 export function buildSPDParagraphs(data: FormData): Paragraph[] {
   const name = data.employer.legalBusinessName;
@@ -133,5 +134,11 @@ export function buildSPDParagraphs(data: FormData): Paragraph[] {
 
     sectionTitle("10. Qualified Medical Child Support Order"),
     body(`A medical child support order is a judgment, decree or order made under state law that provides for child support or health coverage for the child of a Participant. You may obtain, without charge, a copy of the procedures governing the determination of qualified medical child support orders from the Plan Administrator.`),
+
+    sectionTitle("11. What Are My Rights to Continue Coverage Under COBRA?"),
+    body(`If the Employer normally employs 20 or more employees on a typical business day during the preceding calendar year and group health plan benefits have been selected, you, your spouse, and your dependent children may have the right to continue group health coverage under the Consolidated Omnibus Budget Reconciliation Act of 1985, as amended (“COBRA”) following a qualifying event such as termination of employment, reduction in hours, divorce or legal separation, death of the covered employee, the covered employee’s entitlement to Medicare, or a dependent child ceasing to be a dependent under the Plan. The detailed COBRA continuation provisions, including the maximum periods of coverage, premium requirements, and notice obligations, are set forth in the Plan Document. You may obtain a copy of the Plan Document from the Plan Administrator without charge.`),
+
+    pageBreak(),
+    ...getErisaRightsDocxParagraphs(),
   ];
 }

@@ -6,6 +6,9 @@ import {
   centered, checkboxLine, numberedLine, legalSection, subheading, noteText,
 } from "./pdf-builder";
 import { formatDate, stateName } from "../helpers";
+import { getCobraPDFBuilder } from "../legal-text/cobra";
+import { getFmlaUserraPDFBuilder } from "../legal-text/fmla-userra";
+import { getQmcsoPDFBuilder } from "../legal-text/qmcso";
 
 const ENTITY_TYPE_ORDER: EntityType[] = [
   "c_corp", "s_corp", "non_profit", "partnership", "llc", "llp",
@@ -47,7 +50,10 @@ export function buildCafeteriaPlanPDFSections(data: FormData): PDFSection[] {
         ...(features.flexCredits ? ["G.  FLEXIBLE BENEFIT CREDITS"] : []),
         ...(features.ptoPurchaseSale ? ["H.  PURCHASE AND SALE OF PTO"] : []),
         "I.  MISCELLANEOUS",
-        "J.  EXECUTION PAGE",
+        "J.  COBRA CONTINUATION OF COVERAGE",
+        "K.  FMLA AND USERRA CONTINUATION OF COVERAGE",
+        "L.  QUALIFIED MEDICAL CHILD SUPPORT ORDERS",
+        "M.  EXECUTION PAGE",
       ];
       toc.forEach((t) => bodyText(ctx, t));
     }},
@@ -539,9 +545,27 @@ export function buildCafeteriaPlanPDFSections(data: FormData): PDFSection[] {
       numberedLine(ctx, "5", "State of Organization", stateOfOrg);
     }},
 
-    // J. Execution Page
+    // J. COBRA Continuation of Coverage
     { build: (ctx) => {
-      legalSection(ctx, "J", "Execution Page");
+      legalSection(ctx, "J", "COBRA Continuation of Coverage");
+      getCobraPDFBuilder(ctx);
+    }},
+
+    // K. FMLA and USERRA Continuation
+    { build: (ctx) => {
+      legalSection(ctx, "K", "FMLA and USERRA Continuation of Coverage");
+      getFmlaUserraPDFBuilder(ctx);
+    }},
+
+    // L. Qualified Medical Child Support Orders
+    { build: (ctx) => {
+      legalSection(ctx, "L", "Qualified Medical Child Support Orders");
+      getQmcsoPDFBuilder(ctx);
+    }},
+
+    // M. Execution Page
+    { build: (ctx) => {
+      legalSection(ctx, "M", "Execution Page");
       bodyText(ctx, "Failure to properly fill out the Adoption Agreement may result in the failure of the Plan to achieve its intended tax consequences.");
       emptyLine(ctx);
       bodyText(ctx, "The Plan shall consist of this Adoption Agreement, its related Basic Plan Document #125 and any related Appendix and Addendum to the Adoption Agreement.");

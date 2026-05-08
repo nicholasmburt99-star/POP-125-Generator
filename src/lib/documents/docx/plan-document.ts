@@ -6,6 +6,9 @@ import {
   pageBreak, emptyLine, horizontalRule,
 } from "./docx-builder";
 import { formatDate, formatMonthDay, stateName, entityLabel, benefitsList } from "../helpers";
+import { getCobraDocxParagraphs } from "../legal-text/cobra";
+import { getFmlaUserraDocxParagraphs } from "../legal-text/fmla-userra";
+import { getQmcsoDocxParagraphs } from "../legal-text/qmcso";
 
 export function buildPlanDocumentParagraphs(data: FormData): Paragraph[] {
   const name = data.employer.legalBusinessName;
@@ -35,6 +38,9 @@ export function buildPlanDocumentParagraphs(data: FormData): Paragraph[] {
   p.push(body("VI. Article - Administration"));
   p.push(body("VII. Article - Amendment or Termination of Plan"));
   p.push(body("VIII. Article - Miscellaneous"));
+  p.push(body("IX. Article - COBRA Continuation of Coverage"));
+  p.push(body("X. Article - FMLA and USERRA Continuation of Coverage"));
+  p.push(body("XI. Article - Qualified Medical Child Support Orders"));
   p.push(pageBreak());
 
   // ========== INTRODUCTION ==========
@@ -301,7 +307,7 @@ export function buildPlanDocumentParagraphs(data: FormData): Paragraph[] {
   p.push(body(`The captions contained herein are inserted only as a matter of convenience and for reference, and in no way define, limit, enlarge, or describe the scope or intent of the Plan, nor in any way shall they affect the Plan or the construction of any provision thereof.`));
 
   p.push(sectionTitle("14. Continuation of Coverage"));
-  p.push(body(`Notwithstanding anything in the Plan to the contrary, in the event any benefit under this Plan subject to the continuation coverage requirement of Code Section 4980B becomes unavailable, each Participant will be entitled to continuation coverage as prescribed in Code Section 4980B.`));
+  p.push(body(`Notwithstanding anything in the Plan to the contrary, in the event any benefit under this Plan subject to the continuation coverage requirement of Code Section 4980B becomes unavailable, each Participant will be entitled to continuation coverage as prescribed in Code Section 4980B. The detailed COBRA continuation provisions, FMLA and USERRA continuation provisions, and Qualified Medical Child Support Order procedures are set forth in the Articles titled “COBRA Continuation of Coverage,” “FMLA and USERRA Continuation of Coverage,” and “Qualified Medical Child Support Orders” below.`));
 
   p.push(sectionTitle("15. Health Insurance Portability and Accountability Act"));
   p.push(body(`Notwithstanding anything in this Plan to the contrary, this Plan shall be operated in accordance with HIPAA and regulations thereunder.`));
@@ -312,14 +318,17 @@ export function buildPlanDocumentParagraphs(data: FormData): Paragraph[] {
   p.push(sectionTitle("17. Genetic Information Nondiscrimination Act"));
   p.push(body(`Notwithstanding any provision of this Plan to the contrary, this Plan shall be operated in accordance with GINA and regulations thereunder.`));
 
-  if (data.elections.includeFmlaLanguage) {
-    p.push(sectionTitle("18. Family and Medical Leave Act"));
-    p.push(body(`A Participant who takes an unpaid leave of absence under FMLA may revoke his or her Participation Agreement at the beginning of or during the leave. Such a revocation is binding on the Participant for the balance of the Plan Year and may not be changed until the next Period of Coverage, except for a revoked election under a group health plan which the Participant shall have the right to reinstate at the end of the FMLA leave period.`));
-    p.push(body(`If a Participant chooses to continue coverage under the Employer\u2019s group health plan during an unpaid leave of absence under FMLA, the Plan Administrator shall select among the following options for required payments during the leave of absence:`));
-    p.push(bullet("(a) Pre-payment by the Participant before the commencement of the leave through pre-tax or after-tax payments under a Participation Agreement, from any taxable compensation, including cashing out of unused sick or vacation days, provided all other Plan requirements are met; provided, however, that pre-payment shall not be the sole option offered to a Participant on FMLA leave;"));
-    p.push(bullet("(b) Payment by the Participant of required payments during the leave on the same schedule as payments would be made if the Participant were not on leave, or under another schedule permitted under Department of Labor regulations. The Employer shall not be required to continue group health plan coverage of a Participant who fails to make required payments while on FMLA leave; or"));
-    p.push(bullet("(c) Advancement by the Employer of the Participant\u2019s required payments while the Participant is on FMLA leave. The Employer shall be entitled to recover such advanced amounts when the Participant returns from FMLA leave by payroll deduction."));
-  }
+  // ========== ARTICLE IX - COBRA CONTINUATION OF COVERAGE ==========
+  p.push(pageBreak());
+  p.push(...getCobraDocxParagraphs());
+
+  // ========== ARTICLE X - FMLA AND USERRA CONTINUATION ==========
+  p.push(pageBreak());
+  p.push(...getFmlaUserraDocxParagraphs());
+
+  // ========== ARTICLE XI - QMCSO ==========
+  p.push(pageBreak());
+  p.push(...getQmcsoDocxParagraphs());
 
   // ========== ADOPTION AGREEMENT ==========
   p.push(pageBreak());

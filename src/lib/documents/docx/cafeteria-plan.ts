@@ -7,6 +7,9 @@ import {
   FONT, FONT_SIZE, TITLE_SIZE, SUBHEADING_SIZE,
 } from "./docx-builder";
 import { formatDate, formatMonthDay, stateName } from "../helpers";
+import { getCobraDocxParagraphs } from "../legal-text/cobra";
+import { getFmlaUserraDocxParagraphs } from "../legal-text/fmla-userra";
+import { getQmcsoDocxParagraphs } from "../legal-text/qmcso";
 
 // All entity types in the order they should appear in the JT2 template
 const ENTITY_TYPE_ORDER: EntityType[] = [
@@ -55,7 +58,10 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
     ...(features.flexCredits ? ["G.  FLEXIBLE BENEFIT CREDITS (Flex Credits)"] : []),
     ...(features.ptoPurchaseSale ? ["H.  PURCHASE AND SALE OF PAID TIME OFF (PTO)"] : []),
     "I.  MISCELLANEOUS",
-    "J.  EXECUTION PAGE",
+    "J.  COBRA CONTINUATION OF COVERAGE",
+    "K.  FMLA AND USERRA CONTINUATION OF COVERAGE",
+    "L.  QUALIFIED MEDICAL CHILD SUPPORT ORDERS",
+    "M.  EXECUTION PAGE",
   ];
   for (const item of tocItems) {
     p.push(body(item));
@@ -656,9 +662,24 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
   p.push(numberedLine("5", "State of Organization. State of organization of Plan Sponsor", stateOfOrg));
   p.push(noteText("If state law requires written document language regarding benefits herein, add language to Addendum."));
 
-  // ===== J. EXECUTION PAGE =====
+  // ===== J. COBRA CONTINUATION OF COVERAGE =====
   p.push(pageBreak());
-  p.push(legalSection("J", "Execution Page"));
+  p.push(legalSection("J", "COBRA Continuation of Coverage"));
+  p.push(...getCobraDocxParagraphs());
+
+  // ===== K. FMLA AND USERRA CONTINUATION =====
+  p.push(pageBreak());
+  p.push(legalSection("K", "FMLA and USERRA Continuation of Coverage"));
+  p.push(...getFmlaUserraDocxParagraphs());
+
+  // ===== L. QUALIFIED MEDICAL CHILD SUPPORT ORDERS =====
+  p.push(pageBreak());
+  p.push(legalSection("L", "Qualified Medical Child Support Orders"));
+  p.push(...getQmcsoDocxParagraphs());
+
+  // ===== M. EXECUTION PAGE =====
+  p.push(pageBreak());
+  p.push(legalSection("M", "Execution Page"));
   p.push(body("Failure to properly fill out the Adoption Agreement may result in the failure of the Plan to achieve its intended tax consequences."));
   p.push(emptyLine());
   p.push(body("The Plan shall consist of this Adoption Agreement, its related Basic Plan Document #125 and any related Appendix and Addendum to the Adoption Agreement."));

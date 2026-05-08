@@ -42,24 +42,23 @@ export function buildElectionToParticipateParagraphs(data: FormData): Paragraph[
   ];
 }
 
-// ===== ELECTION TO NOT PARTICIPATE =====
-export function buildElectionToNotParticipateParagraphs(data: FormData): Paragraph[] {
+// ===== WAIVER OF PARTICIPATION =====
+export function buildWaiverOfParticipationParagraphs(data: FormData): Paragraph[] {
   const name = data.employer.legalBusinessName;
   const pyStart = formatMonthDay(data.plan.planYearStart);
   const pyEnd = formatMonthDay(data.plan.planYearEnd);
   const shortLabel = planTypeLabelShort(data);
   const fullLabel = planTypeLabelFull(data);
+  const planName = `${name} ${shortLabel}`;
 
   return [
-    ...formHeader(name, "Election to not Participate", pyStart, pyEnd, fullLabel),
+    ...formHeader(name, "Waiver of Participation", pyStart, pyEnd, fullLabel),
 
-    body(`I understand all the benefit options available under the ${shortLabel}.`),
+    body(`To be completed if any eligible employee is declining coverage under the ${planName}.`),
     emptyLine(),
-    body(`I elect NOT to participate in the ${shortLabel} and instead to receive my full compensation in taxable compensation. I understand that I will receive the full amount of my salary and other compensation without reduction for benefits available, or any reduction on applicable employment tax costs.`),
+    body(`I, ______________________________, elect to waive coverage under the ${planName} at this time. I understand that my decision is for the length of the plan year, and only in the event of a life change would I be eligible to change my election prior to the next plan year.`),
     emptyLine(),
-    bodyBold("I understand that:"),
-    bullet(`I cannot change or revoke any of my elections under the Plan at any time during the Plan Year unless I have a “change in status” and the election change is consistent with the “change in status” (including marriage, divorce, death of a spouse or child, birth or adoption of a child, commencement or termination of employment of a spouse, change in employment status from full-time to part-time or vice versa, taking an unpaid leave of absence, or such other events as the Plan Administrator determines will permit a change or revocation of an election).`),
-    bullet(`Prior to each Plan Year I will be offered the opportunity to change my benefit election for the following Plan Year. If I do not complete and return a new election form at that time, I will be treated as having elected to continue my election to receive full cash compensation in effect for the new Plan Year.`),
+    body(`I have read and I understand the Summary Plan Description and the related Adoption Agreement, which were provided to me by my employer. I have been given the opportunity to apply for the available benefits and have elected not to enroll.`),
     ...dualSignatureBlock(),
   ];
 }
