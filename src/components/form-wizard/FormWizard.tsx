@@ -413,6 +413,7 @@ export function FormWizard({ initialData, editId }: FormWizardProps = {}) {
 
       const data = await res.json();
       router.push(`/dashboard/generate/${data.id}`);
+      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Generation failed");
       setGenerating(false);

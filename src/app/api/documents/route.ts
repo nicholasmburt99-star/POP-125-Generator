@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { generateAllDocuments } from "@/lib/documents/generator";
 import { getOrCreateDefaultUser } from "@/lib/default-user";
@@ -50,6 +51,9 @@ export async function POST(request: Request) {
     const updated = await prisma.documentSet.findUnique({
       where: { id: docSet.id },
     });
+
+    revalidatePath("/dashboard");
+    revalidatePath(`/dashboard/generate/${docSet.id}`);
 
     return NextResponse.json(updated);
   } catch (err) {

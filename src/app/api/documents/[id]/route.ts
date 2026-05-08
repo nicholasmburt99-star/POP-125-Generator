@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { generateAllDocuments } from "@/lib/documents/generator";
 import { del } from "@vercel/blob";
@@ -45,6 +46,9 @@ export async function PUT(
       },
     });
 
+    revalidatePath(`/dashboard/generate/${id}`);
+    revalidatePath("/dashboard");
+
     return NextResponse.json(updated);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
@@ -80,6 +84,8 @@ export async function DELETE(
       await del(blobUrls);
     }
     await prisma.documentSet.delete({ where: { id } });
+
+    revalidatePath("/dashboard");
 
     return NextResponse.json({ success: true });
   } catch (err) {
