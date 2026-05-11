@@ -83,6 +83,25 @@ export function StepCafeHSAConfig({ data, onChange, onNext, onBack }: Props) {
         )}
       </section>
 
+      <section className="space-y-3 rounded-lg border p-4">
+        <h3 className="font-medium text-sm">HDHP Plan Identification</h3>
+        <p className="text-xs text-gray-500">
+          HSA eligibility requires enrollment in a High Deductible Health Plan (HDHP)
+          that satisfies Code Section 223. Enter the name(s) of the employer-sponsored
+          medical plan options that qualify as HDHPs. Participants must be enrolled in
+          one of these plans to be eligible to contribute to an HSA.
+        </p>
+        <div>
+          <Label htmlFor="qualifyingHdhpPlans" className="text-xs">Qualifying HDHP plan name(s)</Label>
+          <Input
+            id="qualifyingHdhpPlans"
+            value={data.qualifyingHdhpPlans}
+            onChange={(e) => update("qualifyingHdhpPlans", e.target.value)}
+            placeholder="e.g., Acme Gold HDHP, Acme Silver HDHP"
+          />
+        </div>
+      </section>
+
       <div className="flex justify-between pt-4">
         <Button type="button" variant="outline" onClick={onBack}>Back</Button>
         <Button type="submit">Next</Button>

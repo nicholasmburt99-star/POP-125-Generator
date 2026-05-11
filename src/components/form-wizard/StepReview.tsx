@@ -1,11 +1,20 @@
 "use client";
 
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import type { FormData } from "@/types";
 import { ENTITY_TYPE_LABELS } from "@/types";
 import { US_STATES } from "@/types";
-import { Loader2, Pencil } from "lucide-react";
+import { AlertTriangle, Loader2, Pencil } from "lucide-react";
+import { format, parseISO } from "date-fns";
+
+interface DuplicateMatch {
+  id: string;
+  employerName: string;
+  createdAt: string;
+  planType: string;
+}
 
 interface Props {
   formData: FormData;
@@ -13,6 +22,7 @@ interface Props {
   onGoToStep: (step: number) => void;
   onGenerate: () => void;
   generating: boolean;
+  duplicateMatch?: DuplicateMatch;
 }
 
 function stateName(code: string) {
@@ -65,6 +75,7 @@ export function StepReview({
   onGoToStep,
   onGenerate,
   generating,
+  duplicateMatch,
 }: Props) {
   const { employer, plan, benefits, elections, contacts } = formData;
 
@@ -176,6 +187,33 @@ export function StepReview({
           />
         )}
       </Section>
+
+      {duplicateMatch && (
+        <div className="rounded-md bg-yellow-50 border border-yellow-200 p-4 text-sm text-yellow-900">
+          <div className="flex gap-3">
+            <AlertTriangle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+            <div className="space-y-2">
+              <p>
+                <strong>A document set already exists for &ldquo;{duplicateMatch.employerName}&rdquo;</strong>{" "}
+                (created {format(parseISO(duplicateMatch.createdAt), "MMM d, yyyy")}, plan type{" "}
+                <em>{duplicateMatch.planType === "cafeteria" ? "Cafeteria" : "POP"}</em>).
+              </p>
+              <p>
+                Only one Section 125 plan document can be operative at a time. If you meant to
+                update the existing entry, open it and use <em>Edit &amp; Regenerate</em>. If
+                you really want to create a second document set for this employer, click
+                Generate Documents below.
+              </p>
+              <Link
+                href={`/dashboard/generate/${duplicateMatch.id}`}
+                className="inline-block text-blue-600 hover:underline font-medium"
+              >
+                Open existing entry &rarr;
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="flex justify-between pt-4">
         <Button type="button" variant="outline" onClick={onBack}>

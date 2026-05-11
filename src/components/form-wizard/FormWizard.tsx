@@ -73,12 +73,20 @@ interface StepDescriptor {
   render: () => React.ReactNode;
 }
 
+export interface ExistingDocumentSummary {
+  id: string;
+  employerName: string;
+  createdAt: string;
+  planType: string;
+}
+
 interface FormWizardProps {
   initialData?: FormData;
   editId?: string;
+  existingDocuments?: ExistingDocumentSummary[];
 }
 
-export function FormWizard({ initialData, editId }: FormWizardProps = {}) {
+export function FormWizard({ initialData, editId, existingDocuments = [] }: FormWizardProps = {}) {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState<FormData>(() => {
@@ -374,15 +382,26 @@ export function FormWizard({ initialData, editId }: FormWizardProps = {}) {
     list.push({
       key: "review",
       label: "Review",
-      render: () => (
-        <StepReview
-          formData={formData}
-          onBack={back}
-          onGoToStep={goToStep}
-          onGenerate={handleGenerate}
-          generating={generating}
-        />
-      ),
+      render: () => {
+        // Only flag duplicates in create mode. Skip when editing an existing entry.
+        const duplicateMatch = editId
+          ? undefined
+          : existingDocuments.find(
+              (d) =>
+                d.employerName.trim().toLowerCase().replace(/\s+/g, " ") ===
+                formData.employer.legalBusinessName.trim().toLowerCase().replace(/\s+/g, " "),
+            );
+        return (
+          <StepReview
+            formData={formData}
+            onBack={back}
+            onGoToStep={goToStep}
+            onGenerate={handleGenerate}
+            generating={generating}
+            duplicateMatch={duplicateMatch}
+          />
+        );
+      },
     });
 
     return list;

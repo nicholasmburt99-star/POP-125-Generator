@@ -371,6 +371,7 @@ export interface HSAConfig {
   nonElectiveOther: string;
   contributionLimitMode: ContributionLimitMode;
   contributionLimitAmount: string;
+  qualifyingHdhpPlans: string;
 }
 
 // ---- G. Flex Credits ----
@@ -590,6 +591,7 @@ export function emptyCafeteriaConfig(): CafeteriaConfig {
       nonElectiveOther: "",
       contributionLimitMode: "code_max",
       contributionLimitAmount: "",
+      qualifyingHdhpPlans: "",
     },
     flexCredits: {
       healthFlexContribution: false,

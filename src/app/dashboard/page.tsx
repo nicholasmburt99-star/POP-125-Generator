@@ -10,9 +10,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Plus, Download, Pencil } from "lucide-react";
+import { Plus, Download, Pencil, AlertTriangle } from "lucide-react";
 import { format } from "date-fns";
 import { DeleteButton } from "@/components/dashboard/DeleteButton";
+
+function normalizeName(name: string): string {
+  return name.trim().toLowerCase().replace(/\s+/g, " ");
+}
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -20,6 +24,13 @@ export default async function DashboardPage() {
     orderBy: { createdAt: "desc" },
     include: { createdBy: { select: { name: true, email: true } } },
   });
+
+  // Count documents per normalized employer name so we can flag duplicates.
+  const employerCounts = new Map<string, number>();
+  for (const d of documents) {
+    const key = normalizeName(d.employerName);
+    employerCounts.set(key, (employerCounts.get(key) ?? 0) + 1);
+  }
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -51,7 +62,9 @@ export default async function DashboardPage() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {documents.map((doc) => (
+          {documents.map((doc) => {
+            const duplicateCount = (employerCounts.get(normalizeName(doc.employerName)) ?? 1) - 1;
+            return (
             <Card key={doc.id}>
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
@@ -78,7 +91,17 @@ export default async function DashboardPage() {
                   </Badge>
                 </div>
               </CardHeader>
-              <CardContent className="pt-0">
+              <CardContent className="pt-0 space-y-3">
+                {duplicateCount > 0 && (
+                  <div className="flex gap-2 rounded-md bg-yellow-50 border border-yellow-200 p-2 text-xs text-yellow-900">
+                    <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                    <span>
+                      <strong>{duplicateCount} other document set{duplicateCount === 1 ? "" : "s"} exist{duplicateCount === 1 ? "s" : ""} for this employer.</strong>{" "}
+                      Only one Section 125 plan document can be operative at a time. Retire the
+                      others or use <em>Edit &amp; Regenerate</em> on the canonical one.
+                    </span>
+                  </div>
+                )}
                 <div className="flex gap-2">
                   <Link href={`/dashboard/generate/${doc.id}/edit`}>
                     <Button variant="outline" size="sm" className="gap-2">
@@ -106,7 +129,8 @@ export default async function DashboardPage() {
                 </div>
               </CardContent>
             </Card>
-          ))}
+          );
+          })}
         </div>
       )}
     </div>

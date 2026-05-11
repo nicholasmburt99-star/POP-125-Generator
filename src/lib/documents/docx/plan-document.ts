@@ -276,7 +276,7 @@ export function buildPlanDocumentParagraphs(data: FormData): Paragraph[] {
 
   p.push(sectionTitle("02. Termination"));
   p.push(body(`The Employer is establishing this Plan with the intent that it will be maintained for an indefinite period of time. Notwithstanding the foregoing, the Employer reserves the right to terminate the Plan, in whole or in part, at any time. In the event the Plan is terminated, no further contributions shall be made. Benefits under any Insurance Contract shall be paid in accordance with the terms of the Contract.`));
-  p.push(body(`Any Salary Redirection amount that was withheld from a Participant’s Compensation but that has not yet been remitted by the Employer to the applicable Insurer as of the date of Plan termination shall be refunded to the Participant in accordance with the Section titled “Termination of Employment” of Article II of this Plan. Because this is a premium-only cafeteria plan, no reimbursement account is maintained and no Plan assets are held in reserve; therefore, no forfeitures or experience gains are anticipated upon Plan termination.`));
+  p.push(body(`Upon termination of the Plan, any unremitted Salary Redirections held by the Employer shall be returned to the affected Participants as soon as administratively practicable, to the extent permitted by applicable law and the terms of the underlying benefit programs.`));
 
   // ========== ARTICLE VIII - MISCELLANEOUS ==========
   p.push(pageBreak());

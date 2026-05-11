@@ -148,8 +148,8 @@ export function buildCafeteriaPlanPDFSections(data: FormData): PDFSection[] {
       subheading(ctx, "6.  Simple Cafeteria Plan");
       checkboxLine(ctx, cafe.simpleCafeteriaPlan.enabled, "a.  The Plan is intended to qualify as a simple cafeteria plan under Code section 125(j).", { indent: 1 });
       bodyText(ctx, "b.  The Employer shall make contributions to the Plan as follows:", { indent: true });
-      checkboxLine(ctx, cafe.simpleCafeteriaPlan.contributionType === "compensation_pct", `i.  ${cafe.simpleCafeteriaPlan.compensationPct || "_____"}% (no less than 2%) of an Eligible Employee's Compensation.`, { indent: 2 });
-      checkboxLine(ctx, cafe.simpleCafeteriaPlan.contributionType === "salary_match", `ii.  ${cafe.simpleCafeteriaPlan.salaryMatchPct || "_____"}% (at least 200%) of salary reduction contribution, but no less than 6% of Compensation.`, { indent: 2 });
+      checkboxLine(ctx, cafe.simpleCafeteriaPlan.enabled && cafe.simpleCafeteriaPlan.contributionType === "compensation_pct", `i.  ${cafe.simpleCafeteriaPlan.enabled && cafe.simpleCafeteriaPlan.compensationPct ? cafe.simpleCafeteriaPlan.compensationPct : "_____"}% (no less than 2%) of an Eligible Employee's Compensation.`, { indent: 2 });
+      checkboxLine(ctx, cafe.simpleCafeteriaPlan.enabled && cafe.simpleCafeteriaPlan.contributionType === "salary_match", `ii.  ${cafe.simpleCafeteriaPlan.enabled && cafe.simpleCafeteriaPlan.salaryMatchPct ? cafe.simpleCafeteriaPlan.salaryMatchPct : "_____"}% (at least 200%) of salary reduction contribution, but no less than 6% of Compensation.`, { indent: 2 });
     }},
 
     // B. Eligibility
@@ -469,6 +469,9 @@ export function buildCafeteriaPlanPDFSections(data: FormData): PDFSection[] {
         bodyText(ctx, "3.  Maximum HSA contribution:", { bold: true });
         checkboxLine(ctx, hsa.contributionLimitMode === "code_max", "a.  Maximum permitted under Code 223(b), reduced by Employer contributions.", { indent: 1 });
         checkboxLine(ctx, hsa.contributionLimitMode === "other_amount", `b.  Other:  ${hsa.contributionLimitAmount}`, { indent: 1 });
+
+        bodyText(ctx, "4.  HDHP Plan Identification.", { bold: true });
+        bodyText(ctx, `HSA eligibility under this Plan is limited to Participants enrolled in an Employer-sponsored medical plan option that qualifies as a High Deductible Health Plan (HDHP) under Code Section 223. The qualifying HDHP option(s) offered by the Employer are: ${hsa.qualifyingHdhpPlans || "_______________________"}. The Plan Administrator shall update this designation at each open enrollment period and communicate qualifying options to Participants in enrollment materials.`, { indent: true });
       },
     } as PDFSection] : []),
 
