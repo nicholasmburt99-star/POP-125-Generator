@@ -52,6 +52,7 @@ export interface PlanBenefits {
   groupMedical: boolean;
   groupDental: boolean;
   groupVision: boolean;
+  groupTermLife: boolean;
 }
 
 export interface ElectionOptions {
@@ -113,7 +114,6 @@ export interface CafeteriaIdentity {
   planNameLine2: string;          // typically "Cafeteria Plan"
   isRestatement: boolean;
   restatementDate: string;        // YYYY-MM-DD
-  planYearEndDate: string;        // MM/DD format, e.g. "12/31"
   shortPlanYear: boolean;
   shortPlanYearStart: string;
   shortPlanYearEnd: string;
@@ -445,7 +445,6 @@ export function emptyCafeteriaConfig(): CafeteriaConfig {
       planNameLine2: "Cafeteria Plan",
       isRestatement: false,
       restatementDate: "",
-      planYearEndDate: "12/31",
       shortPlanYear: false,
       shortPlanYearStart: "",
       shortPlanYearEnd: "",

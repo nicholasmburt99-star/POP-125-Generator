@@ -5,7 +5,7 @@ import {
   bodyText, signatureBlock, emptyLine,
   centered, checkboxLine, numberedLine, legalSection, subheading, noteText,
 } from "./pdf-builder";
-import { formatDate, stateName } from "../helpers";
+import { formatDate, formatMonthDay, stateName } from "../helpers";
 import { getCobraPDFBuilder } from "../legal-text/cobra";
 import { getFmlaUserraPDFBuilder } from "../legal-text/fmla-userra";
 import { getQmcsoPDFBuilder } from "../legal-text/qmcso";
@@ -21,10 +21,30 @@ export function buildCafeteriaPlanPDFSections(data: FormData): PDFSection[] {
 
   const name = data.employer.legalBusinessName;
   const effective = formatDate(data.plan.effectiveDate);
+  const pyStart = formatMonthDay(data.plan.planYearStart);
+  const pyEnd = formatMonthDay(data.plan.planYearEnd);
   const govLaw = stateName(data.employer.stateOfGoverningLaw);
   const stateOfOrg = stateName(data.employer.stateOfOrganization);
   const features = cafe.features;
   const anyFSA = features.healthFSA || features.limitedPurposeFSA || features.postDeductibleFSA || features.dcap || features.adoptionAssistanceFSA;
+
+  // Build a dynamic section-letter map so optional sections don't leave letter gaps.
+  const sec: Record<string, string> = {};
+  let _letterIdx = 0;
+  const next = () => String.fromCharCode(65 + _letterIdx++);
+  sec.general = next();
+  sec.eligibility = next();
+  sec.participation = next();
+  if (features.premiumConversion) sec.premiumConversion = next();
+  if (anyFSA) sec.fsa = next();
+  if (features.hsa) sec.hsa = next();
+  if (features.flexCredits) sec.flexCredits = next();
+  if (features.ptoPurchaseSale) sec.pto = next();
+  sec.misc = next();
+  sec.cobra = next();
+  sec.fmla = next();
+  sec.qmcso = next();
+  sec.execution = next();
 
   return [
     // Title page
@@ -41,19 +61,19 @@ export function buildCafeteriaPlanPDFSections(data: FormData): PDFSection[] {
       const toc = [
         "COMPANY INFORMATION",
         "PLAN INFORMATION",
-        "A.  GENERAL INFORMATION AND DEFINITIONS",
-        "B.  ELIGIBILITY",
-        "C.  PARTICIPATION ELECTIONS",
-        ...(features.premiumConversion ? ["D.  PREMIUM CONVERSION ACCOUNT"] : []),
-        ...(anyFSA ? ["E.  FLEXIBLE SPENDING ACCOUNTS"] : []),
-        ...(features.hsa ? ["F.  HEALTH SAVINGS ACCOUNT"] : []),
-        ...(features.flexCredits ? ["G.  FLEXIBLE BENEFIT CREDITS"] : []),
-        ...(features.ptoPurchaseSale ? ["H.  PURCHASE AND SALE OF PTO"] : []),
-        "I.  MISCELLANEOUS",
-        "J.  COBRA CONTINUATION OF COVERAGE",
-        "K.  FMLA AND USERRA CONTINUATION OF COVERAGE",
-        "L.  QUALIFIED MEDICAL CHILD SUPPORT ORDERS",
-        "M.  EXECUTION PAGE",
+        `${sec.general}.  GENERAL INFORMATION AND DEFINITIONS`,
+        `${sec.eligibility}.  ELIGIBILITY`,
+        `${sec.participation}.  PARTICIPATION ELECTIONS`,
+        ...(features.premiumConversion ? [`${sec.premiumConversion}.  PREMIUM CONVERSION ACCOUNT`] : []),
+        ...(anyFSA ? [`${sec.fsa}.  FLEXIBLE SPENDING ACCOUNTS`] : []),
+        ...(features.hsa ? [`${sec.hsa}.  HEALTH SAVINGS ACCOUNT`] : []),
+        ...(features.flexCredits ? [`${sec.flexCredits}.  FLEXIBLE BENEFIT CREDITS`] : []),
+        ...(features.ptoPurchaseSale ? [`${sec.pto}.  PURCHASE AND SALE OF PTO`] : []),
+        `${sec.misc}.  MISCELLANEOUS`,
+        `${sec.cobra}.  COBRA CONTINUATION OF COVERAGE`,
+        `${sec.fmla}.  FMLA AND USERRA CONTINUATION OF COVERAGE`,
+        `${sec.qmcso}.  QUALIFIED MEDICAL CHILD SUPPORT ORDERS`,
+        `${sec.execution}.  EXECUTION PAGE`,
       ];
       toc.forEach((t) => bodyText(ctx, t));
     }},
@@ -63,7 +83,7 @@ export function buildCafeteriaPlanPDFSections(data: FormData): PDFSection[] {
       centered(ctx, "ADOPTION AGREEMENT", 14, true);
       centered(ctx, "CAFETERIA PLAN", 14, true);
       emptyLine(ctx);
-      bodyText(ctx, "The undersigned adopting employer hereby adopts this Plan. The Plan is intended to qualify as a cafeteria plan under Code section 125. The Plan shall consist of this Adoption Agreement, its related Basic Plan Document and any related Appendix and Addendum to the Adoption Agreement.");
+      bodyText(ctx, "The undersigned adopting employer hereby adopts this Plan. The Plan is intended to qualify as a cafeteria plan under Code section 125. The Plan shall consist of this Adoption Agreement and the related Summary Plan Description, together with any Appendix or Addendum to the Adoption Agreement, all of which are incorporated herein by reference.");
       emptyLine(ctx);
       centered(ctx, "COMPANY INFORMATION", 11, true);
       emptyLine(ctx);
@@ -93,7 +113,7 @@ export function buildCafeteriaPlanPDFSections(data: FormData): PDFSection[] {
 
     // A. General Information
     { build: (ctx) => {
-      legalSection(ctx, "A", "General Information and Definitions");
+      legalSection(ctx, sec.general, "General Information and Definitions");
       numberedLine(ctx, "1", "Plan Number", cafe.identity.planNumber);
       subheading(ctx, "2.  Plan Name:");
       bodyText(ctx, `a.  ${cafe.identity.planNameLine1}`, { indent: true });
@@ -104,7 +124,7 @@ export function buildCafeteriaPlanPDFSections(data: FormData): PDFSection[] {
         bodyText(ctx, `b.  Effective date of Plan restatement: ${formatDate(cafe.identity.restatementDate)}`, { indent: true });
       }
       subheading(ctx, "4.  Plan Year:");
-      bodyText(ctx, `a.  Plan Years mean each 12-consecutive month period ending on ${cafe.identity.planYearEndDate}.`, { indent: true });
+      bodyText(ctx, `a.  Plan Years mean each 12-consecutive month period beginning on ${pyStart} and ending on ${pyEnd}.`, { indent: true });
       checkboxLine(ctx, cafe.identity.shortPlanYear, `b.  The Plan has a short Plan Year. Begins ${cafe.identity.shortPlanYearStart || "_____"}, ends ${cafe.identity.shortPlanYearEnd || "_____"}.`, { indent: 1 });
 
       subheading(ctx, "Plan Features");
@@ -134,7 +154,7 @@ export function buildCafeteriaPlanPDFSections(data: FormData): PDFSection[] {
 
     // B. Eligibility
     { build: (ctx) => {
-      legalSection(ctx, "B", "Eligibility");
+      legalSection(ctx, sec.eligibility, "Eligibility");
       subheading(ctx, "Eligible Employees");
       numberedLine(ctx, "1", "Minimum age requirement", String(cafe.eligibility.minAge));
 
@@ -209,7 +229,7 @@ export function buildCafeteriaPlanPDFSections(data: FormData): PDFSection[] {
 
     // C. Participation
     { build: (ctx) => {
-      legalSection(ctx, "C", "Participation Elections");
+      legalSection(ctx, sec.participation, "Participation Elections");
       subheading(ctx, "Failure to Elect (Default Elections)");
       bodyText(ctx, "1.  The election for the immediately preceding Plan Year applies for:", { bold: true });
       checkboxLine(ctx, cafe.participation.defaultElections.premiumConversion && features.premiumConversion, "a.  Premium Conversion Account", { indent: 1 });
@@ -233,7 +253,7 @@ export function buildCafeteriaPlanPDFSections(data: FormData): PDFSection[] {
     // D. Premium Conversion (conditional)
     ...(features.premiumConversion ? [{
       build: (ctx) => {
-        legalSection(ctx, "D", "Premium Conversion Account");
+        legalSection(ctx, sec.premiumConversion, "Premium Conversion Account");
         subheading(ctx, "Contracts for Reimbursement");
         bodyText(ctx, "1.  Contract types for which a Participant may contribute:", { bold: true });
         const ct = cafe.premiumConversion.contractTypes;
@@ -250,7 +270,12 @@ export function buildCafeteriaPlanPDFSections(data: FormData): PDFSection[] {
           { key: "individualDisability", letter: "j", label: "Individually-Owned Disability" },
           { key: "cobra", letter: "k", label: "COBRA continuation coverage" },
         ];
-        rows.forEach((r) => checkboxLine(ctx, ct[r.key] as boolean, `${r.letter}.  ${r.label}`, { indent: 1 }));
+        rows.forEach((r) => {
+          checkboxLine(ctx, ct[r.key] as boolean, `${r.letter}.  ${r.label}`, { indent: 1 });
+          if (r.key === "employerGroupTermLife" && ct.employerGroupTermLife) {
+            noteText(ctx, "Only the portion of the Group Term Life premium attributable to the first $50,000 of coverage is eligible for pre-tax treatment. The cost of coverage in excess of $50,000 is subject to imputed income inclusion under Code Section 79 (using the Section 79 Table I uniform premium rates), which the Employer shall include in the Participant’s wages for federal income tax and FICA purposes.");
+          }
+        });
         checkboxLine(ctx, ct.other, `l.  Other:  ${ct.otherDescription}`, { indent: 1 });
 
         subheading(ctx, "Enrollment");
@@ -263,7 +288,7 @@ export function buildCafeteriaPlanPDFSections(data: FormData): PDFSection[] {
     // E. FSA (conditional)
     ...(anyFSA ? [{
       build: (ctx) => {
-        legalSection(ctx, "E", "Flexible Spending Accounts");
+        legalSection(ctx, sec.fsa, "Flexible Spending Accounts");
         noteText(ctx, "If Flexible Spending Accounts are not a permitted Benefit under A.5b, Section E is disregarded.");
 
         // E.1 Matching Contributions
@@ -324,7 +349,7 @@ export function buildCafeteriaPlanPDFSections(data: FormData): PDFSection[] {
 
         // E.5 Expenses Not Eligible
         subheading(ctx, "Expenses Not Eligible for Reimbursement");
-        bodyText(ctx, "5.  Expenses Not Eligible for Reimbursement. In addition to those listed in the Basic Plan Document, the following expenses are not eligible for reimbursement from a Participant's FSA:", { bold: true });
+        bodyText(ctx, "5.  Expenses Not Eligible for Reimbursement. In addition to those generally ineligible under Code Sections 213(d), 21, or 137 (as applicable), the following expenses are not eligible for reimbursement from a Participant's FSA:", { bold: true });
         checkboxLine(ctx, !!cafe.fsa.expensesNotEligibleHealth, `a.  Health Flexible Spending Account:  ${cafe.fsa.expensesNotEligibleHealth}`, { indent: 1 });
         checkboxLine(ctx, !!cafe.fsa.expensesNotEligibleLimited, `b.  Limited Purpose/Post-Deductible Health Flexible Spending Account (HSA-Compatible FSA):  ${cafe.fsa.expensesNotEligibleLimited}`, { indent: 1 });
         checkboxLine(ctx, !!cafe.fsa.expensesNotEligibleDcap, `c.  Dependent Care Assistance Plan Account:  ${cafe.fsa.expensesNotEligibleDcap}`, { indent: 1 });
@@ -424,7 +449,7 @@ export function buildCafeteriaPlanPDFSections(data: FormData): PDFSection[] {
     // F. HSA (conditional)
     ...(features.hsa ? [{
       build: (ctx) => {
-        legalSection(ctx, "F", "Health Savings Account (HSA Account)");
+        legalSection(ctx, sec.hsa, "Health Savings Account (HSA Account)");
         const hsa = cafe.hsa;
         subheading(ctx, "Employer Contributions");
         bodyText(ctx, "1.  Matching Contributions to HSA:", { bold: true });
@@ -450,7 +475,7 @@ export function buildCafeteriaPlanPDFSections(data: FormData): PDFSection[] {
     // G. Flex Credits (conditional)
     ...(features.flexCredits ? [{
       build: (ctx) => {
-        legalSection(ctx, "G", "Flexible Benefit Credits (Flex Credits) (Section 11.01)");
+        legalSection(ctx, sec.flexCredits, "Flexible Benefit Credits (Flex Credits)");
         noteText(ctx, "If Flexible Benefit Credits are not permitted Benefits in A.5h, Section G is disregarded.");
         const fc = cafe.flexCredits;
         subheading(ctx, "Health Flex Contribution");
@@ -499,7 +524,7 @@ export function buildCafeteriaPlanPDFSections(data: FormData): PDFSection[] {
     // H. PTO (conditional)
     ...(features.ptoPurchaseSale ? [{
       build: (ctx) => {
-        legalSection(ctx, "H", "Purchase and Sale of Paid Time Off (PTO) (Section 11.02)");
+        legalSection(ctx, sec.pto, "Purchase and Sale of Paid Time Off (PTO)");
         const pto = cafe.pto;
         subheading(ctx, "Purchase of PTO");
         bodyText(ctx, "1.  Maximum PTO Purchase. A Participant can elect to purchase no more than the following periods of PTO in a Plan Year:", { bold: true });
@@ -528,7 +553,7 @@ export function buildCafeteriaPlanPDFSections(data: FormData): PDFSection[] {
 
     // I. Miscellaneous
     { build: (ctx) => {
-      legalSection(ctx, "I", "Miscellaneous");
+      legalSection(ctx, sec.misc, "Miscellaneous");
       subheading(ctx, "Plan Administrator Information");
       bodyText(ctx, "1.  Plan Administrator:", { bold: true });
       checkboxLine(ctx, cafe.misc.planAdminType === "sponsor", "a.  Plan Sponsor", { indent: 1 });
@@ -537,7 +562,7 @@ export function buildCafeteriaPlanPDFSections(data: FormData): PDFSection[] {
 
       bodyText(ctx, "2.  Indemnification:", { bold: true });
       checkboxLine(ctx, cafe.misc.indemnificationType === "none", "a.  None - the Company will not indemnify the Plan Administrator.", { indent: 1 });
-      checkboxLine(ctx, cafe.misc.indemnificationType === "standard", "b.  Standard as provided in Section 14.02.", { indent: 1 });
+      checkboxLine(ctx, cafe.misc.indemnificationType === "standard", "b.  Standard indemnification, under which the Company shall indemnify and defend the Plan Administrator to the fullest extent permitted by law against any liabilities, damages, costs, and expenses occasioned by any act or omission in connection with the Plan, provided the act or omission was undertaken in good faith.", { indent: 1 });
       checkboxLine(ctx, cafe.misc.indemnificationType === "custom", "c.  Custom (per Addendum to Adoption Agreement).", { indent: 1 });
 
       numberedLine(ctx, "3", "Governing Law", govLaw);
@@ -547,30 +572,30 @@ export function buildCafeteriaPlanPDFSections(data: FormData): PDFSection[] {
 
     // J. COBRA Continuation of Coverage
     { build: (ctx) => {
-      legalSection(ctx, "J", "COBRA Continuation of Coverage");
+      legalSection(ctx, sec.cobra, "COBRA Continuation of Coverage");
       getCobraPDFBuilder(ctx);
     }},
 
     // K. FMLA and USERRA Continuation
     { build: (ctx) => {
-      legalSection(ctx, "K", "FMLA and USERRA Continuation of Coverage");
+      legalSection(ctx, sec.fmla, "FMLA and USERRA Continuation of Coverage");
       getFmlaUserraPDFBuilder(ctx);
     }},
 
     // L. Qualified Medical Child Support Orders
     { build: (ctx) => {
-      legalSection(ctx, "L", "Qualified Medical Child Support Orders");
+      legalSection(ctx, sec.qmcso, "Qualified Medical Child Support Orders");
       getQmcsoPDFBuilder(ctx);
     }},
 
     // M. Execution Page
     { build: (ctx) => {
-      legalSection(ctx, "M", "Execution Page");
+      legalSection(ctx, sec.execution, "Execution Page");
       bodyText(ctx, "Failure to properly fill out the Adoption Agreement may result in the failure of the Plan to achieve its intended tax consequences.");
       emptyLine(ctx);
-      bodyText(ctx, "The Plan shall consist of this Adoption Agreement, its related Basic Plan Document #125 and any related Appendix and Addendum to the Adoption Agreement.");
+      bodyText(ctx, "The Plan shall consist of this Adoption Agreement and the related Summary Plan Description, together with any Appendix or Addendum to the Adoption Agreement, all of which are incorporated herein by reference.");
       emptyLine(ctx);
-      bodyText(ctx, `The undersigned agrees to be bound by the terms of this Adoption Agreement and Basic Plan Document. The Plan Sponsor caused this Plan to be executed this ____ day of ____________________, ${effective.split(", ")[1] || "20__"}.`);
+      bodyText(ctx, `The undersigned agrees to be bound by the terms of this Adoption Agreement and acknowledges receipt of same. The Plan Sponsor caused this Plan to be executed this ____ day of ____________________, ${effective.split(", ")[1] || "20__"}.`);
       signatureBlock(ctx, name);
     }},
   ];

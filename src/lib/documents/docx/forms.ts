@@ -19,8 +19,9 @@ export function buildElectionToParticipateParagraphs(data: FormData): Paragraph[
   const benefits = electionFormBenefits(data);
   const shortLabel = planTypeLabelShort(data);
   const fullLabel = planTypeLabelFull(data);
+  const hsaEnabled = data.plan.planType === "cafeteria" && !!data.cafeteria?.features.hsa;
 
-  return [
+  const paragraphs: Paragraph[] = [
     ...formHeader(name, "Election to Participate", pyStart, pyEnd, fullLabel),
 
     body(`As an eligible employee in the above plan, I acknowledge that I have received the Summary Plan Description. I have read the Summary Plan Description and understand the benefits available to me as well as the other rights and obligations which I have under the Plan.`),
@@ -39,15 +40,30 @@ export function buildElectionToParticipateParagraphs(data: FormData): Paragraph[
     emptyLine(),
     body("Total per-pay-period salary redirection: $______________"),
     emptyLine(),
-    bodyBold("I understand that:"),
+    bodyBold("Payroll Deduction Authorization:"),
+    body("I expressly authorize my Employer to deduct from each of my paychecks the per-pay-period salary redirection amount(s) elected above, beginning with the first pay period on or after the effective date of this election and continuing for the duration of the Plan Year or until I revoke this election as permitted by the Plan. I consent to receive Plan-related notices, election confirmations, and other communications electronically (including by email and the Employer’s benefits portal) where permitted by applicable law."),
+    emptyLine(),
+    bodyBold("Acknowledgments — Premium Conversion and FSA Elections:"),
     bullet("If I do not specify dollar amounts above, I authorize salary redirections in the amounts of the current premiums being charged for the coverage(s) and tier elected."),
     bullet("If my required contributions to pay premiums for the elected benefits are increased or decreased while this Election remains in effect, my compensation redirection will automatically be adjusted to reflect that increase or decrease."),
-    bullet("I cannot change or revoke any of my elections under this Plan at any time during the Plan Year unless I have a “change in status” and the election change is consistent with the “change in status.”"),
-    bullet("Any amounts that are not used during a Plan Year to provide benefits will be forfeited and may not be paid to me in taxable compensation or used to provide benefits specifically for me in a later Plan Year."),
+    bullet("Other than as permitted under the HSA acknowledgments below (if applicable), I cannot change or revoke any of my Premium Conversion or FSA elections under this Plan at any time during the Plan Year unless I have a “change in status” and the election change is consistent with the “change in status.”"),
+    bullet("Any amounts contributed to an FSA that are not used during the Plan Year (and any applicable run-out, grace period, or carryover) will be forfeited as required by IRS rules. This forfeiture rule does NOT apply to HSA contributions; HSA balances are always owned by the participant."),
     bullet("Prior to the first day of each Plan Year I will be offered the opportunity to change my benefit elections for that Plan Year."),
     bullet("My Social Security benefits may be slightly reduced due to my pre-tax contributions to the Plan."),
-    ...dualSignatureBlock(),
   ];
+
+  if (hsaEnabled) {
+    paragraphs.push(
+      emptyLine(),
+      bodyBold("Additional Acknowledgments — Health Savings Account (HSA) Contributions:"),
+      bullet("My HSA is owned by me. Unused HSA balances roll over from year to year and never forfeit, even if I change employers, change health plans, retire, or leave the workforce."),
+      bullet("My HSA salary-reduction election is NOT locked in for the Plan Year. I may start, stop, increase, or decrease my HSA contributions on a prospective basis at any time during the Plan Year, in accordance with the procedures established by the Plan Administrator and consistent with IRS Notice 2004-50."),
+      bullet("My HSA eligibility depends on my continued enrollment in an HDHP and the absence of disqualifying coverage (other than permitted insurance and limited-purpose/post-deductible health FSAs). I am solely responsible for monitoring my own HSA eligibility and for ensuring that my total HSA contributions from all sources do not exceed the annual statutory limit set by the IRS."),
+    );
+  }
+
+  paragraphs.push(...dualSignatureBlock());
+  return paragraphs;
 }
 
 // ===== WAIVER OF PARTICIPATION =====

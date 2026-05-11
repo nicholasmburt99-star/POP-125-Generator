@@ -32,6 +32,25 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
   const features = cafe.features;
   const anyFSA = features.healthFSA || features.limitedPurposeFSA || features.postDeductibleFSA || features.dcap || features.adoptionAssistanceFSA;
 
+  // Build a dynamic section-letter map so optional sections (premiumConversion,
+  // anyFSA, hsa, flexCredits, ptoPurchaseSale) don't leave letter gaps.
+  const sec: Record<string, string> = {};
+  let _letterIdx = 0;
+  const next = () => String.fromCharCode(65 + _letterIdx++);
+  sec.general = next();
+  sec.eligibility = next();
+  sec.participation = next();
+  if (features.premiumConversion) sec.premiumConversion = next();
+  if (anyFSA) sec.fsa = next();
+  if (features.hsa) sec.hsa = next();
+  if (features.flexCredits) sec.flexCredits = next();
+  if (features.ptoPurchaseSale) sec.pto = next();
+  sec.misc = next();
+  sec.cobra = next();
+  sec.fmla = next();
+  sec.qmcso = next();
+  sec.execution = next();
+
   const p: Paragraph[] = [];
 
   // ===== TITLE PAGE =====
@@ -49,19 +68,19 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
   const tocItems = [
     "COMPANY INFORMATION",
     "PLAN INFORMATION",
-    "A.  GENERAL INFORMATION AND DEFINITIONS",
-    "B.  ELIGIBILITY",
-    "C.  PARTICIPATION ELECTIONS",
-    ...(features.premiumConversion ? ["D.  PREMIUM CONVERSION ACCOUNT"] : []),
-    ...(anyFSA ? ["E.  FLEXIBLE SPENDING ACCOUNTS"] : []),
-    ...(features.hsa ? ["F.  HEALTH SAVINGS ACCOUNT (HSA Account)"] : []),
-    ...(features.flexCredits ? ["G.  FLEXIBLE BENEFIT CREDITS (Flex Credits)"] : []),
-    ...(features.ptoPurchaseSale ? ["H.  PURCHASE AND SALE OF PAID TIME OFF (PTO)"] : []),
-    "I.  MISCELLANEOUS",
-    "J.  COBRA CONTINUATION OF COVERAGE",
-    "K.  FMLA AND USERRA CONTINUATION OF COVERAGE",
-    "L.  QUALIFIED MEDICAL CHILD SUPPORT ORDERS",
-    "M.  EXECUTION PAGE",
+    `${sec.general}.  GENERAL INFORMATION AND DEFINITIONS`,
+    `${sec.eligibility}.  ELIGIBILITY`,
+    `${sec.participation}.  PARTICIPATION ELECTIONS`,
+    ...(features.premiumConversion ? [`${sec.premiumConversion}.  PREMIUM CONVERSION ACCOUNT`] : []),
+    ...(anyFSA ? [`${sec.fsa}.  FLEXIBLE SPENDING ACCOUNTS`] : []),
+    ...(features.hsa ? [`${sec.hsa}.  HEALTH SAVINGS ACCOUNT (HSA Account)`] : []),
+    ...(features.flexCredits ? [`${sec.flexCredits}.  FLEXIBLE BENEFIT CREDITS (Flex Credits)`] : []),
+    ...(features.ptoPurchaseSale ? [`${sec.pto}.  PURCHASE AND SALE OF PAID TIME OFF (PTO)`] : []),
+    `${sec.misc}.  MISCELLANEOUS`,
+    `${sec.cobra}.  COBRA CONTINUATION OF COVERAGE`,
+    `${sec.fmla}.  FMLA AND USERRA CONTINUATION OF COVERAGE`,
+    `${sec.qmcso}.  QUALIFIED MEDICAL CHILD SUPPORT ORDERS`,
+    `${sec.execution}.  EXECUTION PAGE`,
   ];
   for (const item of tocItems) {
     p.push(body(item));
@@ -72,7 +91,7 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
   p.push(centeredText("ADOPTION AGREEMENT", SUBHEADING_SIZE, true));
   p.push(centeredText("CAFETERIA PLAN", SUBHEADING_SIZE, true));
   p.push(emptyLine());
-  p.push(body("The undersigned adopting employer hereby adopts this Plan. The Plan is intended to qualify as a cafeteria plan under Code section 125. The Plan shall consist of this Adoption Agreement, its related Basic Plan Document and any related Appendix and Addendum to the Adoption Agreement. Unless otherwise indicated, all Section references are to Sections in the Basic Plan Document."));
+  p.push(body("The undersigned adopting employer hereby adopts this Plan. The Plan is intended to qualify as a cafeteria plan under Code section 125. The Plan shall consist of this Adoption Agreement and the related Summary Plan Description, together with any Appendix or Addendum to the Adoption Agreement, all of which are incorporated herein by reference."));
   p.push(emptyLine());
 
   // ===== COMPANY INFORMATION =====
@@ -134,7 +153,7 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
   p.push(emptyLine());
 
   // ===== A. GENERAL INFORMATION AND DEFINITIONS =====
-  p.push(legalSection("A", "General Information and Definitions"));
+  p.push(legalSection(sec.general, "General Information and Definitions"));
   p.push(numberedLine("1", "Plan Number", cafe.identity.planNumber));
   p.push(subheading("2.  Plan Name:"));
   p.push(body(`a.  ${cafe.identity.planNameLine1}`, { indent: true }));
@@ -149,8 +168,11 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
     p.push(body(`b.  Effective date of Plan restatement: ${formatDate(cafe.identity.restatementDate)} ("Restatement Date")`, { indent: true }));
   }
 
+  const pyStart = formatMonthDay(data.plan.planYearStart);
+  const pyEnd = formatMonthDay(data.plan.planYearEnd);
+
   p.push(subheading("4.  Plan Year:"));
-  p.push(body(`a.  Plan Years mean each 12-consecutive month period ending on ${cafe.identity.planYearEndDate} (e.g. December 31). If the Plan Year changes, any special provisions regarding a short Plan Year shall be placed in the Addendum to the Adoption Agreement.`, { indent: true }));
+  p.push(body(`a.  Plan Years mean each 12-consecutive month period beginning on ${pyStart} and ending on ${pyEnd}. If the Plan Year changes, any special provisions regarding a short Plan Year shall be placed in the Addendum to the Adoption Agreement.`, { indent: true }));
   p.push(checkboxLine(
     cafe.identity.shortPlanYear,
     `b.  The Plan has a short Plan Year. The short Plan Year begins ${cafe.identity.shortPlanYearStart || "_____"} and ends ${cafe.identity.shortPlanYearEnd || "_____"}.`,
@@ -195,7 +217,7 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
 
   // ===== B. ELIGIBILITY =====
   p.push(pageBreak());
-  p.push(legalSection("B", "Eligibility"));
+  p.push(legalSection(sec.eligibility, "Eligibility"));
   p.push(subheading("Eligible Employees - Employees must meet the following requirements:"));
   p.push(numberedLine("1", "Minimum age requirement for an Employee to become an Eligible Employee", String(cafe.eligibility.minAge)));
   p.push(noteText("If the Plan is intended to be a simple cafeteria plan under Article 12, B.1 may not exceed \"21.\""));
@@ -289,7 +311,7 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
   p.push(checkboxLine(cafe.leave.reemploymentAfter30 === "employee_choice", "c.  the Eligible Employee may elect to reinstate the Benefit election in effect at the time of Termination or make a new election under the Plan", { indent: 1 }));
 
   // ===== C. PARTICIPATION ELECTIONS =====
-  p.push(legalSection("C", "Participation Elections"));
+  p.push(legalSection(sec.participation, "Participation Elections"));
   p.push(subheading("Failure to Elect (Default Elections)"));
   p.push(body("1.  The election for the immediately preceding Plan Year relating to the following Benefits will apply to the applicable Plan Year:", { bold: true }));
   p.push(checkboxLine(cafe.participation.defaultElections.premiumConversion && features.premiumConversion, "a.  Premium Conversion Account (Non-Employer-sponsored Contracts)", { indent: 1 }));
@@ -313,7 +335,7 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
 
   // ===== D. PREMIUM CONVERSION ACCOUNT =====
   if (features.premiumConversion) {
-    p.push(legalSection("D", "Premium Conversion Account"));
+    p.push(legalSection(sec.premiumConversion, "Premium Conversion Account"));
     p.push(subheading("Contracts for Reimbursement"));
     p.push(noteText("If Premium Conversion Account is not a selected Benefit under A.5a, Section D is disregarded."));
     p.push(body("1.  If Premium Conversion Accounts are allowed under the Plan, select the types of Contracts with respect to which a Participant may contribute under Section 5.04:", { bold: true }));
@@ -333,6 +355,9 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
     ];
     contractRows.forEach((row) => {
       p.push(checkboxLine(ct[row.key] as boolean, `${row.letter}.  ${row.label}`, { indent: 1 }));
+      if (row.key === "employerGroupTermLife" && ct.employerGroupTermLife) {
+        p.push(noteText("Only the portion of the Group Term Life premium attributable to the first $50,000 of coverage is eligible for pre-tax treatment. The cost of coverage in excess of $50,000 is subject to imputed income inclusion under Code Section 79 (using the Section 79 Table I uniform premium rates), which the Employer shall include in the Participant’s wages for federal income tax and FICA purposes."));
+      }
     });
     p.push(checkboxLine(ct.other, `l.  Other:  ${ct.otherDescription}`, { indent: 1 }));
 
@@ -354,7 +379,7 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
 
   // ===== E. FLEXIBLE SPENDING ACCOUNTS =====
   if (anyFSA) {
-    p.push(legalSection("E", "Flexible Spending Accounts"));
+    p.push(legalSection(sec.fsa, "Flexible Spending Accounts"));
     p.push(noteText("If Flexible Spending Accounts are not a permitted Benefit under A.5b, Section E is disregarded."));
 
     // ---- E.1 Matching Contributions ----
@@ -438,7 +463,7 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
 
     // ---- E.5 Expenses Not Eligible ----
     p.push(subheading("Expenses Not Eligible for Reimbursement"));
-    p.push(body("5.  Expenses Not Eligible for Reimbursement. In addition to those listed in the Basic Plan Document, the following expenses are not eligible for reimbursement from a Participant's FSA:", { bold: true }));
+    p.push(body("5.  Expenses Not Eligible for Reimbursement. In addition to those generally ineligible under Code Sections 213(d), 21, or 137 (as applicable), the following expenses are not eligible for reimbursement from a Participant's FSA:", { bold: true }));
     p.push(checkboxLine(!!cafe.fsa.expensesNotEligibleHealth, `a.  Health Flexible Spending Account:  ${cafe.fsa.expensesNotEligibleHealth}`, { indent: 1 }));
     p.push(checkboxLine(!!cafe.fsa.expensesNotEligibleLimited, `b.  Limited Purpose/Post-Deductible Health Flexible Spending Account (HSA-Compatible FSA):  ${cafe.fsa.expensesNotEligibleLimited}`, { indent: 1 }));
     p.push(checkboxLine(!!cafe.fsa.expensesNotEligibleDcap, `c.  Dependent Care Assistance Plan Account:  ${cafe.fsa.expensesNotEligibleDcap}`, { indent: 1 }));
@@ -544,7 +569,7 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
 
   // ===== F. HEALTH SAVINGS ACCOUNT =====
   if (features.hsa) {
-    p.push(legalSection("F", "Health Savings Account (HSA Account) (Article 9)"));
+    p.push(legalSection(sec.hsa, "Health Savings Account (HSA Account)"));
     p.push(noteText("If HSA Account is not a permitted Benefit under A.5g, Section F is disregarded."));
 
     p.push(subheading("Employer Contributions"));
@@ -570,7 +595,7 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
 
   // ===== G. FLEXIBLE BENEFIT CREDITS =====
   if (features.flexCredits) {
-    p.push(legalSection("G", "Flexible Benefit Credits (Flex Credits) (Section 11.01)"));
+    p.push(legalSection(sec.flexCredits, "Flexible Benefit Credits (Flex Credits)"));
     p.push(noteText("If Flexible Benefit Credits are not permitted Benefits in A.5h, Section G is disregarded."));
     const fc = cafe.flexCredits;
 
@@ -618,7 +643,7 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
 
   // ===== H. PURCHASE AND SALE OF PTO =====
   if (features.ptoPurchaseSale) {
-    p.push(legalSection("H", "Purchase and Sale of Paid Time Off (PTO) (Section 11.02)"));
+    p.push(legalSection(sec.pto, "Purchase and Sale of Paid Time Off (PTO)"));
     const pto = cafe.pto;
     p.push(subheading("Purchase of PTO"));
     p.push(body("1.  Maximum PTO Purchase. A Participant can elect to purchase no more than the following periods of PTO in a Plan Year:", { bold: true }));
@@ -645,7 +670,7 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
   }
 
   // ===== I. MISCELLANEOUS =====
-  p.push(legalSection("I", "Miscellaneous"));
+  p.push(legalSection(sec.misc, "Miscellaneous"));
   p.push(subheading("Plan Administrator Information"));
   p.push(body("1.  Plan Administrator.", { bold: true }));
   p.push(checkboxLine(cafe.misc.planAdminType === "sponsor", "a.  Plan Sponsor", { indent: 1 }));
@@ -654,8 +679,8 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
 
   p.push(body("2.  Indemnification. Type of indemnification for the Plan Administrator:", { bold: true }));
   p.push(checkboxLine(cafe.misc.indemnificationType === "none", "a.  None - the Company will not indemnify the Plan Administrator.", { indent: 1 }));
-  p.push(checkboxLine(cafe.misc.indemnificationType === "standard", "b.  Standard as provided in Section 14.02.", { indent: 1 }));
-  p.push(checkboxLine(cafe.misc.indemnificationType === "custom", "c.  Custom. (If I.2.c. (Custom) is selected, indemnification for the Plan Administrator is provided pursuant to an Addendum to the Adoption Agreement.)", { indent: 1 }));
+  p.push(checkboxLine(cafe.misc.indemnificationType === "standard", "b.  Standard indemnification, under which the Company shall indemnify and defend the Plan Administrator to the fullest extent permitted by law against any liabilities, damages, costs, and expenses occasioned by any act or omission to act in connection with the Plan, provided that such act or omission was undertaken in good faith.", { indent: 1 }));
+  p.push(checkboxLine(cafe.misc.indemnificationType === "custom", `c.  Custom. (If ${sec.misc}.2.c. (Custom) is selected, indemnification for the Plan Administrator is provided pursuant to an Addendum to the Adoption Agreement.)`, { indent: 1 }));
 
   p.push(numberedLine("3", "Governing Law. The following state's law shall govern the terms of the Plan to the extent not pre-empted by Federal law", govLaw));
   p.push(numberedLine("4", "Participating Employers. Additional participating employers may be specified in an addendum to the Adoption Agreement", "", { valueBold: false }));
@@ -664,27 +689,27 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
 
   // ===== J. COBRA CONTINUATION OF COVERAGE =====
   p.push(pageBreak());
-  p.push(legalSection("J", "COBRA Continuation of Coverage"));
+  p.push(legalSection(sec.cobra, "COBRA Continuation of Coverage"));
   p.push(...getCobraDocxParagraphs());
 
   // ===== K. FMLA AND USERRA CONTINUATION =====
   p.push(pageBreak());
-  p.push(legalSection("K", "FMLA and USERRA Continuation of Coverage"));
+  p.push(legalSection(sec.fmla, "FMLA and USERRA Continuation of Coverage"));
   p.push(...getFmlaUserraDocxParagraphs());
 
   // ===== L. QUALIFIED MEDICAL CHILD SUPPORT ORDERS =====
   p.push(pageBreak());
-  p.push(legalSection("L", "Qualified Medical Child Support Orders"));
+  p.push(legalSection(sec.qmcso, "Qualified Medical Child Support Orders"));
   p.push(...getQmcsoDocxParagraphs());
 
   // ===== M. EXECUTION PAGE =====
   p.push(pageBreak());
-  p.push(legalSection("M", "Execution Page"));
+  p.push(legalSection(sec.execution, "Execution Page"));
   p.push(body("Failure to properly fill out the Adoption Agreement may result in the failure of the Plan to achieve its intended tax consequences."));
   p.push(emptyLine());
-  p.push(body("The Plan shall consist of this Adoption Agreement, its related Basic Plan Document #125 and any related Appendix and Addendum to the Adoption Agreement."));
+  p.push(body("The Plan shall consist of this Adoption Agreement and the related Summary Plan Description, together with any Appendix or Addendum to the Adoption Agreement, all of which are incorporated herein by reference."));
   p.push(emptyLine());
-  p.push(body(`The undersigned agree to be bound by the terms of this Adoption Agreement and Basic Plan Document and acknowledge receipt of same. The Plan Sponsor caused this Plan to be executed this ____ day of ____________________, ${effective.split(", ")[1] || "20__"}.`));
+  p.push(body(`The undersigned agrees to be bound by the terms of this Adoption Agreement and acknowledges receipt of same. The Plan Sponsor caused this Plan to be executed this ____ day of ____________________, ${effective.split(", ")[1] || "20__"}.`));
   p.push(emptyLine());
   p.push(...signatureBlock(name));
 

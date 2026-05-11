@@ -58,7 +58,7 @@ const PERIOD_PARAGRAPHS = [
   "Continuation Coverage shall extend, in the case of a Qualifying Event described in (b) above (termination of employment or reduction of hours), for a period of 18 months after the date of the Qualifying Event. In the case of any other Qualifying Event, Continuation Coverage shall extend for a period of 36 months after the date of the Qualifying Event.",
   "If a Qualified Beneficiary is determined under the Social Security Act to have been disabled at any time during the first 60 days of Continuation Coverage, the 18-month period described above shall be extended to 29 months for the disabled Qualified Beneficiary and any non-disabled Qualified Beneficiaries who experienced the same Qualifying Event, provided the Qualified Beneficiary furnishes notice of the disability determination to the Plan Administrator within 60 days after the date of the determination and before the end of the original 18-month period.",
   "If a second Qualifying Event occurs during a period of Continuation Coverage that began as a result of a termination of employment or reduction of hours, Continuation Coverage for the affected Qualified Beneficiaries shall be extended to a maximum of 36 months from the date of the original Qualifying Event, provided the Qualified Beneficiary furnishes notice of the second Qualifying Event to the Plan Administrator within 60 days after the second Qualifying Event.",
-  "Notwithstanding the foregoing, Continuation Coverage may be terminated earlier upon the occurrence of any of the following: (a) the date the Employer ceases to provide any group health plan to any employee; (b) the date on which coverage ceases under the Plan by reason of failure to make timely payment of the premium for Continuation Coverage; (c) the date on which the Qualified Beneficiary first becomes, after the date of election, covered under any other group health plan that does not contain any exclusion or limitation with respect to any pre-existing condition of the Qualified Beneficiary; (d) the date on which the Qualified Beneficiary first becomes, after the date of election, entitled to Medicare benefits under Title XVIII of the Social Security Act; or (e) in the case of a disability extension, the first month that begins more than 30 days after a final determination by the Social Security Administration that the disabled Qualified Beneficiary is no longer disabled.",
+  "Notwithstanding the foregoing, Continuation Coverage may be terminated earlier upon the occurrence of any of the following: (a) the date the Employer ceases to provide any group health plan to any employee; (b) the date on which coverage ceases under the Plan by reason of failure to make timely payment of the premium for Continuation Coverage; (c) the date on which the Qualified Beneficiary first becomes, after the date of election, covered under any other group health plan; (d) the date on which the Qualified Beneficiary first becomes, after the date of election, entitled to Medicare benefits under Title XVIII of the Social Security Act; or (e) in the case of a disability extension, the first month that begins more than 30 days after a final determination by the Social Security Administration that the disabled Qualified Beneficiary is no longer disabled.",
 ];
 
 const PREMIUM_PARAGRAPHS = [
@@ -76,10 +76,6 @@ const PA_NOTICE_PARAGRAPHS = [
 
 const QB_NOTICE_PARAGRAPHS = [
   "Each Covered Member or Qualified Beneficiary is responsible for notifying the Plan Administrator of (a) a divorce or legal separation, (b) a Dependent child ceasing to be a Dependent under the terms of the Plan, (c) a determination by the Social Security Administration that a Qualified Beneficiary is disabled or is no longer disabled, and (d) the occurrence of a second Qualifying Event during a period of Continuation Coverage. Notice must be provided to the Plan Administrator in writing within 60 days after the later of the event or the date the Qualified Beneficiary loses (or would lose) coverage as a result of the event. Failure to provide timely notice will result in the loss of the right to Continuation Coverage or the loss of any extension of Continuation Coverage.",
-];
-
-const TRADE_ACT_PARAGRAPHS = [
-  "A Covered Member who is determined to be eligible for trade adjustment assistance or alternative trade adjustment assistance under the Trade Act of 2002, as amended, and who did not elect Continuation Coverage during the original Election Period, shall have an additional 60-day election period beginning on the first day of the month in which the Covered Member becomes a Trade Act Eligible Individual. Continuation Coverage elected during the additional election period shall begin on the first day of the additional election period and shall not include any period before such date.",
 ];
 
 const CONSISTENCY_PARAGRAPH =
@@ -109,9 +105,6 @@ export function getCobraDocxParagraphs(): Paragraph[] {
   p.push(docxSubheading("Notices from Covered Members and Qualified Beneficiaries"));
   QB_NOTICE_PARAGRAPHS.forEach((t) => p.push(docxBody(t)));
 
-  p.push(docxSubheading("Trade Act Eligible Individuals"));
-  TRADE_ACT_PARAGRAPHS.forEach((t) => p.push(docxBody(t)));
-
   p.push(docxSubheading("Consistency with COBRA Regulations"));
   p.push(docxBody(CONSISTENCY_PARAGRAPH));
 
@@ -140,9 +133,6 @@ export function getCobraPDFBuilder(ctx: PDFContext): void {
 
   pdfSubheading(ctx, "Notices from Covered Members and Qualified Beneficiaries");
   QB_NOTICE_PARAGRAPHS.forEach((t) => pdfBodyText(ctx, t));
-
-  pdfSubheading(ctx, "Trade Act Eligible Individuals");
-  TRADE_ACT_PARAGRAPHS.forEach((t) => pdfBodyText(ctx, t));
 
   pdfSubheading(ctx, "Consistency with COBRA Regulations");
   pdfBodyText(ctx, CONSISTENCY_PARAGRAPH);

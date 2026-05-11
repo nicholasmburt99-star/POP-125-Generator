@@ -23,6 +23,14 @@ export function StepPlanInfo({ data, onChange, onNext, onBack }: Props) {
     onNext();
   }
 
+  const isPastEffective = (() => {
+    if (!data.effectiveDate) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const eff = new Date(data.effectiveDate + "T00:00:00");
+    return eff < today;
+  })();
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <h2 className="text-xl font-semibold mb-4">Plan Information</h2>
@@ -78,6 +86,16 @@ export function StepPlanInfo({ data, onChange, onNext, onBack }: Props) {
               onChange={(e) => update("effectiveDate", e.target.value)}
               required
             />
+            {isPastEffective && (
+              <div className="rounded-md bg-yellow-50 border border-yellow-200 p-3 text-xs text-yellow-900 mt-2">
+                <strong>Heads up:</strong> this effective date is in the past.
+                Pre-tax salary reductions for any payroll already run since this
+                date are at risk unless the Adoption Agreement and Certificate
+                of Resolution were executed (signed and dated) before the
+                effective date. Push the effective date forward, or make sure
+                signatures are in place before relying on this plan.
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">

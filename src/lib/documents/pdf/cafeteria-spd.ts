@@ -41,7 +41,7 @@ export function buildCafeteriaSPDPDFSections(data: FormData): PDFSection[] {
       emptyLine(ctx);
       bodyText(ctx, "Read this SPD carefully so that you understand the provisions of the Plan and the benefits you and your eligible Dependents will receive. If the non-technical language in this SPD and the legal language of the Adoption Agreement or Basic Plan Document conflict, the Plan documents will always govern.");
       emptyLine(ctx);
-      bodyText(ctx, "The Plan is subject to the Internal Revenue Code, the Employee Retirement Income Security Act of 1974, as amended (“ERISA”), and other federal and state laws and regulations. The Plan may be amended or terminated by the Company at any time. If the Plan is amended or terminated, the Company will notify you.");
+      bodyText(ctx, "The cafeteria plan component of this Plan, which permits pre-tax salary redirection under Section 125 of the Internal Revenue Code, is not itself an employee welfare benefit plan subject to the Employee Retirement Income Security Act of 1974, as amended (“ERISA”). The underlying group medical, dental, vision, and other welfare benefits paid for through this Plan are generally separate employee welfare benefit plans subject to ERISA, and are governed by the policies, certificates, and plan documents issued for those benefits. Your ERISA rights with respect to those underlying welfare benefit plans are described in the Statement of ERISA Rights at the end of this Summary Plan Description and in the Summary Plan Descriptions for the underlying benefit plans, which you may obtain from the Plan Administrator. The Plan may be amended or terminated by the Company at any time. If the Plan is amended or terminated, the Company will notify you.");
     }},
 
     // General Information
@@ -124,7 +124,11 @@ export function buildCafeteriaSPDPDFSections(data: FormData): PDFSection[] {
         bodyText(ctx, "What may HSA funds be used for?", { bold: true });
         bodyText(ctx, "HSA funds may be used to pay for qualified medical expenses incurred by you, your spouse, or your tax dependents, as defined in Code Section 213(d). Distributions for qualified medical expenses are tax-free. Distributions for non-qualified expenses are subject to ordinary income tax and, if you are under age 65, an additional 20% penalty tax.");
         bodyText(ctx, "What happens to unused HSA balances?", { bold: true });
-        bodyText(ctx, "Your HSA is owned by you. Unused balances roll over from year to year and remain yours even if you change employers, change health plans, retire, or leave the workforce.");
+        bodyText(ctx, "Your HSA is owned by you. Unused balances roll over from year to year and remain yours even if you change employers, change health plans, retire, or leave the workforce. HSA balances never forfeit.");
+        bodyText(ctx, "May I change my HSA election during the Plan Year?", { bold: true });
+        bodyText(ctx, "Yes. Unlike Premium Conversion elections (which are generally irrevocable for the Plan Year except for a permitted change in status), HSA salary-reduction elections may be started, stopped, increased, or decreased on a prospective basis at any time during the Plan Year, in accordance with the procedures established by the Plan Administrator and consistent with IRS Notice 2004-50.");
+        bodyText(ctx, "Which medical plan options qualify as HDHPs for HSA eligibility?", { bold: true });
+        bodyText(ctx, "HSA eligibility is tied to enrollment in an HDHP offered by the Employer that meets the requirements of Code Section 223. The specific Employer-sponsored medical plan option(s) that qualify as HDHPs for purposes of HSA eligibility are identified by the Plan Administrator at open enrollment and are described in the medical plan’s Summary of Benefits and Coverage (SBC). You should confirm your enrollment in a qualifying HDHP — and your continued absence of disqualifying coverage — before electing HSA contributions, and you are responsible for monitoring your own HSA eligibility throughout the Plan Year.");
       },
     }] : []),
 

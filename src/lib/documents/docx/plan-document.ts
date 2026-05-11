@@ -170,6 +170,12 @@ export function buildPlanDocumentParagraphs(data: FormData): Paragraph[] {
   p.push(body(`Eligibility to contribute to an HSA requires, in addition to enrollment in an HDHP: (a) that the Employee not be covered under any other health plan that is not an HDHP, other than permitted insurance and disregarded coverage described in Code Section 223(c) (including, without limitation, dental, vision, accident, disability, long-term care, certain limited-purpose or post-deductible health flexible spending arrangements, and certain employee assistance, disease management, and wellness programs that do not provide significant benefits in the nature of medical care); (b) that the Employee not be enrolled in Medicare; and (c) that the Employee not be claimed as a dependent on another person\u2019s federal income tax return.`));
   p.push(body(`The Employee is solely responsible for determining the Employee\u2019s own HSA eligibility, for opening and maintaining an HSA with a qualified HSA trustee or custodian, and for ensuring that contributions to the HSA do not exceed the applicable annual statutory limit. Nothing in this Plan shall be construed to require the Employer to establish, maintain, or fund an HSA on behalf of any Employee, or to verify any Employee\u2019s ongoing HSA eligibility.`));
 
+  if (data.benefits.groupTermLife) {
+    p.push(sectionTitle("06. Group Term Life Premium Conversion \u2014 Section 79 Imputed Income"));
+    p.push(body(`To the extent the Plan permits a Participant to pay Premium Expenses for employer-sponsored Group Term Life insurance on a pre-tax basis through Salary Redirection, only that portion of the Group Term Life premium that is attributable to the first $50,000 of coverage shall be eligible for pre-tax treatment. The cost of Group Term Life coverage in excess of $50,000 is subject to imputed income inclusion under Code Section 79 and the Treasury regulations thereunder, and the Employer shall include such imputed income in the Participant\u2019s wages for federal income tax and FICA purposes in accordance with the Section 79 Table I uniform premium rates published by the Internal Revenue Service.`));
+    p.push(body(`The Participant shall be solely responsible for any tax consequences arising from coverage in excess of $50,000. Nothing in this Section is intended to alter the tax treatment of Group Term Life insurance under Code Section 79; rather, this Section clarifies the interaction between the cafeteria plan pre-tax election mechanism and the Section 79 imputed-income rules.`));
+  }
+
   // ========== ARTICLE V - PARTICIPANT ELECTIONS ==========
   p.push(pageBreak());
   p.push(articleHeading("V. Article - Participant Elections"));
@@ -270,7 +276,7 @@ export function buildPlanDocumentParagraphs(data: FormData): Paragraph[] {
 
   p.push(sectionTitle("02. Termination"));
   p.push(body(`The Employer is establishing this Plan with the intent that it will be maintained for an indefinite period of time. Notwithstanding the foregoing, the Employer reserves the right to terminate the Plan, in whole or in part, at any time. In the event the Plan is terminated, no further contributions shall be made. Benefits under any Insurance Contract shall be paid in accordance with the terms of the Contract.`));
-  p.push(body(`Any amounts remaining in any such fund or account as of the end of the Plan Year in which Plan termination occurs shall be forfeited and deposited in the Benefit Plan surplus.`));
+  p.push(body(`Any Salary Redirection amount that was withheld from a Participant’s Compensation but that has not yet been remitted by the Employer to the applicable Insurer as of the date of Plan termination shall be refunded to the Participant in accordance with the Section titled “Termination of Employment” of Article II of this Plan. Because this is a premium-only cafeteria plan, no reimbursement account is maintained and no Plan assets are held in reserve; therefore, no forfeitures or experience gains are anticipated upon Plan termination.`));
 
   // ========== ARTICLE VIII - MISCELLANEOUS ==========
   p.push(pageBreak());

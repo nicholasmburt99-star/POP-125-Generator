@@ -51,7 +51,7 @@ export function buildSPDParagraphs(data: FormData): Paragraph[] {
     body(`2. The company has adopted this Plan effective ${effective}.`),
     body(`3. This Plan\u2019s records are maintained over a twelve-month period. This is known as the Plan Year. The adopted plan year begins on ${pyStart} and ends on ${pyEnd}.`),
     body(`4. This Plan is unfunded, meaning that the funds to pay Benefits and to otherwise operate the Plan come from the general assets of the Employer.`),
-    body(`5. Plan Number: 501. (If the Employer maintains other welfare benefit plans, the Plan Number assigned to this Plan in the Form 5500 series will be the next sequential number in the 500 range, as determined by the Plan Administrator.)`),
+    body(`5. Plan Number: 501.`),
     body(`6. Type of Plan: Premium Only Plan under Section 125 of the Internal Revenue Code.`),
     body(`7. Type of Plan Administration: Employer Administration.`),
     emptyLine(),

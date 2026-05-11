@@ -71,16 +71,6 @@ export function StepCafePlanIdentity({ data, onChange, onNext, onBack }: Props) 
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="planYearEndDate">Plan Year End (MM/DD) *</Label>
-          <Input
-            id="planYearEndDate"
-            value={data.planYearEndDate}
-            onChange={(e) => update("planYearEndDate", e.target.value)}
-            placeholder="12/31"
-            required
-          />
-        </div>
-        <div className="space-y-2">
           <Label>Short Plan Year?</Label>
           <RadioGroup
             value={data.shortPlanYear ? "yes" : "no"}

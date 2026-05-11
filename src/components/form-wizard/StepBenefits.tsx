@@ -22,7 +22,7 @@ export function StepBenefits({ data, onChange, onNext, onBack }: Props) {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!data.groupMedical && !data.groupDental && !data.groupVision) {
+    if (!data.groupMedical && !data.groupDental && !data.groupVision && !data.groupTermLife) {
       setError("At least one benefit must be selected");
       return;
     }
@@ -74,6 +74,23 @@ export function StepBenefits({ data, onChange, onNext, onBack }: Props) {
           <Label htmlFor="groupVision" className="text-base font-normal">
             Group Vision Insurance
           </Label>
+        </div>
+        <div className="rounded-lg border p-4">
+          <div className="flex items-center space-x-3">
+            <Checkbox
+              id="groupTermLife"
+              checked={data.groupTermLife}
+              onCheckedChange={() => toggle("groupTermLife")}
+            />
+            <Label htmlFor="groupTermLife" className="text-base font-normal">
+              Employer Group Term Life (pre-tax up to $50,000 of coverage)
+            </Label>
+          </div>
+          <p className="text-xs text-gray-500 mt-2 ml-7">
+            Coverage above $50,000 is subject to Section 79 imputed income on the
+            employee&apos;s W-2; only the premium for the first $50,000 of coverage
+            is eligible for pre-tax treatment.
+          </p>
         </div>
       </div>
 

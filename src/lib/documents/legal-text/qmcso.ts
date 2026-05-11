@@ -39,7 +39,7 @@ const DEFINITIONS: Array<{ term: string; body: string }> = [
   },
   {
     term: "Qualified Medical Child Support Order (QMCSO)",
-    body: "a Medical Child Support Order which creates or recognizes the existence of an Alternate Recipient’s right, or assigns to an Alternate Recipient the right, to receive benefits for which a Participant or Beneficiary is eligible under the Plan, and which the Plan Administrator has determined satisfies the requirements of Section 609 of ERISA.",
+    body: "a Medical Child Support Order which creates or recognizes the existence of an Alternate Recipient’s right, or assigns to an Alternate Recipient the right, to receive benefits for which a Participant is eligible under the Plan, and which the Plan Administrator has determined satisfies the requirements of Section 609 of ERISA.",
   },
 ];
 
@@ -50,8 +50,8 @@ const REQUIRED_CONTENT_PARAGRAPHS = [
 
 const PROCEDURES_PARAGRAPHS = [
   "Upon receipt of a Medical Child Support Order, the Plan Administrator shall promptly notify the Participant and each Alternate Recipient named in the order (or their designated representatives) of the receipt of the order and the Plan’s procedures for determining whether the order is a QMCSO.",
-  "Within a reasonable period after receipt of the order, the Plan Administrator shall determine whether the order is a QMCSO and shall notify the Participant and each Alternate Recipient (or their designated representatives) of the determination. If the order is determined to be a QMCSO, the Plan Administrator shall enroll the Alternate Recipient(s) and treat them as Beneficiaries under the Plan in accordance with the order.",
-  "During any period in which the qualified status of a Medical Child Support Order is being determined, the Plan Administrator shall separately account for amounts that would have been payable to the Alternate Recipient if the order had been determined to be a QMCSO. If the order is determined to be a QMCSO within 18 months after the date of the first payment that would have been required to be made under the order, the Plan Administrator shall pay the segregated amounts (plus interest, if any) to the Alternate Recipient. If the order is determined not to be a QMCSO, or if its qualified status is not determined within the 18-month period, the Plan Administrator shall pay the segregated amounts (plus interest, if any) to the persons who would have been entitled to such amounts if there had been no order.",
+  "Within a reasonable period after receipt of the order, the Plan Administrator shall determine whether the order is a QMCSO and shall notify the Participant and each Alternate Recipient (or their designated representatives) of the determination. If the order is determined to be a QMCSO, the Plan Administrator shall enroll the Alternate Recipient(s) under the Plan in accordance with the order and shall treat them as covered Dependents of the Participant for purposes of eligibility, claims, appeals, and continuation coverage.",
+  "During any period in which the qualified status of a Medical Child Support Order is being determined, the Plan Administrator shall defer enrollment of the Alternate Recipient under the Plan until the determination is made. If the order is determined to be a QMCSO, the Plan Administrator shall enroll the Alternate Recipient retroactively to the date the order required coverage to begin, to the extent permitted by the applicable Insurance Contract. If the order is determined not to be a QMCSO, the Plan Administrator shall notify the parties of the determination in writing, and no enrollment of the Alternate Recipient shall occur pursuant to the order.",
 ];
 
 const NMSN_PARAGRAPHS = [
@@ -64,7 +64,7 @@ const PAYMENT_PARAGRAPHS = [
 ];
 
 const FIDUCIARY_PARAGRAPH =
-  "A Plan fiduciary who acts in accordance with the procedures described in this Article shall be deemed to have satisfied his or her fiduciary duties under ERISA with respect to the Plan’s administration of medical child support orders. The Plan Administrator shall provide, free of charge, a copy of the Plan’s QMCSO procedures to any Participant or Beneficiary upon request.";
+  "A Plan fiduciary who acts in accordance with the procedures described in this Article shall be deemed to have satisfied his or her fiduciary duties under ERISA with respect to the Plan’s administration of medical child support orders. The Plan Administrator shall provide, free of charge, a copy of the Plan’s QMCSO procedures to any Participant or Alternate Recipient upon request.";
 
 // --- DOCX builder ---
 

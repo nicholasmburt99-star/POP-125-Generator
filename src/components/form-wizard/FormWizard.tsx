@@ -52,6 +52,7 @@ const defaultFormData: FormData = {
     groupMedical: true,
     groupDental: false,
     groupVision: false,
+    groupTermLife: false,
   },
   elections: {
     employeeElections: "first_year_only",

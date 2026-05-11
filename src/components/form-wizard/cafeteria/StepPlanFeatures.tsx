@@ -37,12 +37,28 @@ export function StepCafePlanFeatures({
     onFeaturesChange({ ...features, [key]: !features[key] });
   }
 
+  function setSimpleEnabled(enabled: boolean) {
+    if (enabled) {
+      onSimpleChange({ ...simpleCafeteriaPlan, enabled: true });
+    } else {
+      // Cascade-reset child fields so the rendered AA can never show a
+      // child contribution-type checkbox checked while the parent is unchecked.
+      onSimpleChange({
+        enabled: false,
+        contributionType: null,
+        compensationPct: "",
+        salaryMatchPct: "",
+      });
+    }
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     onNext();
   }
 
   const anySelected = Object.values(features).some(Boolean);
+  const hsaFsaConflict = features.hsa && features.healthFSA;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -76,12 +92,21 @@ export function StepCafePlanFeatures({
         </div>
       )}
 
+      {hsaFsaConflict && (
+        <div className="rounded-md bg-yellow-50 border border-yellow-200 p-3 text-sm text-yellow-900">
+          <strong>Heads up:</strong> a general-purpose Health FSA disqualifies
+          participants from contributing to an HSA. Consider switching to a
+          Limited-Purpose FSA (dental/vision only) or a Post-Deductible FSA to
+          preserve HSA eligibility.
+        </div>
+      )}
+
       <div className="space-y-3 rounded-lg border p-4">
         <div className="flex items-center space-x-3">
           <Checkbox
             id="simpleCaf"
             checked={simpleCafeteriaPlan.enabled}
-            onCheckedChange={(v) => onSimpleChange({ ...simpleCafeteriaPlan, enabled: !!v })}
+            onCheckedChange={(v) => setSimpleEnabled(!!v)}
           />
           <Label htmlFor="simpleCaf" className="font-normal">
             This is a Simple Cafeteria Plan under Code section 125(j)

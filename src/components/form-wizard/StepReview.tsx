@@ -72,6 +72,7 @@ export function StepReview({
     benefits.groupMedical && "Group Medical",
     benefits.groupDental && "Group Dental",
     benefits.groupVision && "Group Vision",
+    benefits.groupTermLife && "Group Term Life (up to $50K pre-tax)",
   ]
     .filter(Boolean)
     .join(", ");

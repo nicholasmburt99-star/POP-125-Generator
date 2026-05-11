@@ -11,6 +11,8 @@ export function buildElectionToParticipatePDF(data: FormData): PDFSection {
   const shortLabel = planTypeLabelShort(data);
   const fullLabel = planTypeLabelFull(data);
 
+  const hsaEnabled = data.plan.planType === "cafeteria" && !!data.cafeteria?.features.hsa;
+
   return { build: (ctx) => {
     formHeader(ctx, name, "Election to Participate", pyStart, pyEnd, fullLabel);
     bodyText(ctx, "As an eligible employee, I acknowledge that I have received and read the Summary Plan Description and understand the benefits available to me and the other rights and obligations I have under the Plan.");
@@ -27,13 +29,23 @@ export function buildElectionToParticipatePDF(data: FormData): PDFSection {
     emptyLine(ctx);
     bodyText(ctx, "Total per-pay-period salary redirection: $______________");
     emptyLine(ctx);
-    bodyText(ctx, "I understand that:", { bold: true });
+    bodyText(ctx, "Payroll Deduction Authorization:", { bold: true });
+    bodyText(ctx, "I expressly authorize my Employer to deduct from each of my paychecks the per-pay-period salary redirection amount(s) elected above, beginning with the first pay period on or after the effective date of this election and continuing for the duration of the Plan Year or until I revoke this election as permitted by the Plan. I consent to receive Plan-related notices, election confirmations, and other communications electronically where permitted by applicable law.");
+    emptyLine(ctx);
+    bodyText(ctx, "Acknowledgments — Premium Conversion and FSA Elections:", { bold: true });
     bulletItem(ctx, "If I do not specify dollar amounts above, I authorize salary redirections in the amounts of the current premiums for the coverage(s) and tier elected.");
     bulletItem(ctx, "If premiums change, my redirection will automatically adjust.");
-    bulletItem(ctx, "I cannot change elections unless I have a qualifying change in status.");
-    bulletItem(ctx, "Unused amounts will be forfeited.");
+    bulletItem(ctx, "Other than as permitted under the HSA acknowledgments below (if applicable), I cannot change my Premium Conversion or FSA elections unless I have a qualifying change in status.");
+    bulletItem(ctx, "Any FSA amounts not used during the Plan Year (and any applicable run-out, grace period, or carryover) will be forfeited. This rule does NOT apply to HSA contributions.");
     bulletItem(ctx, "I will be offered the opportunity to change elections before each Plan Year.");
     bulletItem(ctx, "My Social Security benefits may be slightly reduced.");
+    if (hsaEnabled) {
+      emptyLine(ctx);
+      bodyText(ctx, "Additional Acknowledgments — Health Savings Account (HSA):", { bold: true });
+      bulletItem(ctx, "My HSA is owned by me. Unused HSA balances roll over from year to year and never forfeit.");
+      bulletItem(ctx, "My HSA salary-reduction election is NOT locked in. I may start, stop, increase, or decrease my HSA contributions prospectively at any time during the Plan Year, per IRS Notice 2004-50.");
+      bulletItem(ctx, "My HSA eligibility depends on my enrollment in an HDHP and the absence of disqualifying coverage. I am responsible for monitoring my own HSA eligibility and ensuring contributions do not exceed the annual IRS limit.");
+    }
     dualSignatureBlock(ctx);
   }};
 }

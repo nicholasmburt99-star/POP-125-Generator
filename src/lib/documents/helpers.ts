@@ -50,6 +50,7 @@ export function benefitsList(benefits: PlanBenefits): string[] {
   if (benefits.groupMedical) list.push("Group Medical Plan");
   if (benefits.groupDental) list.push("Group Dental Plan");
   if (benefits.groupVision) list.push("Group Vision Plan");
+  if (benefits.groupTermLife) list.push("Employer Group Term Life (up to $50,000 of coverage on a pre-tax basis)");
   return list;
 }
 

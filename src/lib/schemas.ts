@@ -39,8 +39,9 @@ export const benefitsSchema = z
     groupMedical: z.boolean(),
     groupDental: z.boolean(),
     groupVision: z.boolean(),
+    groupTermLife: z.boolean(),
   })
-  .refine((data) => data.groupMedical || data.groupDental || data.groupVision, {
+  .refine((data) => data.groupMedical || data.groupDental || data.groupVision || data.groupTermLife, {
     message: "At least one benefit must be selected",
   });
 
