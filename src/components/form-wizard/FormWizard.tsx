@@ -56,7 +56,6 @@ const defaultFormData: FormData = {
   },
   elections: {
     employeeElections: "first_year_only",
-    includeElectionForms: true,
     allowChangeBelow30Hours: true,
     allowChangeMarketplace: true,
     allowChangeDependentMarketplace: true,

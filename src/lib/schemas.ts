@@ -51,7 +51,6 @@ export const electionsSchema = z.object({
     "every_year",
     "not_required",
   ]),
-  includeElectionForms: z.boolean(),
   allowChangeBelow30Hours: z.boolean(),
   allowChangeMarketplace: z.boolean(),
   allowChangeDependentMarketplace: z.boolean(),

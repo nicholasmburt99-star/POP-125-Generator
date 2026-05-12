@@ -152,10 +152,6 @@ export function StepReview({
           }
         />
         <Row
-          label="Election Forms"
-          value={elections.includeElectionForms ? "Yes" : "No"}
-        />
-        <Row
           label="Below 30 Hours Change"
           value={elections.allowChangeBelow30Hours ? "Yes" : "No"}
         />

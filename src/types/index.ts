@@ -57,7 +57,6 @@ export interface PlanBenefits {
 
 export interface ElectionOptions {
   employeeElections: "first_year_only" | "every_year" | "not_required";
-  includeElectionForms: boolean;
   allowChangeBelow30Hours: boolean;
   allowChangeMarketplace: boolean;
   allowChangeDependentMarketplace: boolean;

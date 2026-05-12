@@ -5,23 +5,11 @@ import { buildPlanDocumentParagraphs } from "./docx/plan-document";
 import { buildSPDParagraphs } from "./docx/spd";
 import { buildCafeteriaPlanParagraphs } from "./docx/cafeteria-plan";
 import { buildCafeteriaSPDParagraphs } from "./docx/cafeteria-spd";
-import {
-  buildElectionToParticipateParagraphs,
-  buildWaiverOfParticipationParagraphs,
-  buildRevocationFormParagraphs,
-  buildChangeInStatusFormParagraphs,
-} from "./docx/forms";
 import { createPDF, type PDFSection } from "./pdf/pdf-builder";
 import { buildPlanDocumentPDFSections } from "./pdf/plan-document";
 import { buildSPDPDFSections } from "./pdf/spd";
 import { buildCafeteriaPlanPDFSections } from "./pdf/cafeteria-plan";
 import { buildCafeteriaSPDPDFSections } from "./pdf/cafeteria-spd";
-import {
-  buildElectionToParticipatePDF,
-  buildWaiverOfParticipationPDF,
-  buildRevocationFormPDF,
-  buildChangeInStatusFormPDF,
-} from "./pdf/forms";
 
 interface GenerationResult {
   docxUrl: string;
@@ -51,13 +39,6 @@ export async function generateAllDocuments(
     docxSections.push({ paragraphs: buildSPDParagraphs(formData) });
   }
 
-  if (formData.elections.includeElectionForms) {
-    docxSections.push({ paragraphs: buildElectionToParticipateParagraphs(formData) });
-    docxSections.push({ paragraphs: buildWaiverOfParticipationParagraphs(formData) });
-    docxSections.push({ paragraphs: buildRevocationFormParagraphs(formData) });
-    docxSections.push({ paragraphs: buildChangeInStatusFormParagraphs(formData) });
-  }
-
   const docxBuffer = await buildDocx(docxSections);
 
   // --- PDF ---
@@ -69,13 +50,6 @@ export async function generateAllDocuments(
   } else {
     pdfSections.push(...buildPlanDocumentPDFSections(formData));
     pdfSections.push(...buildSPDPDFSections(formData));
-  }
-
-  if (formData.elections.includeElectionForms) {
-    pdfSections.push(buildElectionToParticipatePDF(formData));
-    pdfSections.push(buildWaiverOfParticipationPDF(formData));
-    pdfSections.push(buildRevocationFormPDF(formData));
-    pdfSections.push(buildChangeInStatusFormPDF(formData));
   }
 
   const pdfBuffer = await createPDF(pdfSections);

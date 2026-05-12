@@ -58,17 +58,6 @@ export function StepElections({ data, onChange, onNext, onBack }: Props) {
       <div className="space-y-3">
         <div className="flex items-center space-x-3">
           <Checkbox
-            id="includeElectionForms"
-            checked={data.includeElectionForms}
-            onCheckedChange={(v) => update("includeElectionForms", !!v)}
-          />
-          <Label htmlFor="includeElectionForms" className="font-normal">
-            Include Participant Election Forms
-          </Label>
-        </div>
-
-        <div className="flex items-center space-x-3">
-          <Checkbox
             id="allowChangeBelow30Hours"
             checked={data.allowChangeBelow30Hours}
             onCheckedChange={(v) => update("allowChangeBelow30Hours", !!v)}
