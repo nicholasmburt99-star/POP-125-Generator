@@ -40,10 +40,17 @@ export const benefitsSchema = z
     groupDental: z.boolean(),
     groupVision: z.boolean(),
     groupTermLife: z.boolean(),
+    hsa: z.boolean(),
   })
-  .refine((data) => data.groupMedical || data.groupDental || data.groupVision || data.groupTermLife, {
-    message: "At least one benefit must be selected",
-  });
+  .refine(
+    (data) =>
+      data.groupMedical ||
+      data.groupDental ||
+      data.groupVision ||
+      data.groupTermLife ||
+      data.hsa,
+    { message: "At least one benefit must be selected" },
+  );
 
 export const electionsSchema = z.object({
   employeeElections: z.enum([
@@ -69,10 +76,19 @@ export const contactsSchema = z.object({
   generalAgentContact: contactSchema.optional(),
 });
 
+export const hipaaSchema = z.object({
+  privacyOfficerName: z.string(),
+  privacyOfficerTitle: z.string(),
+  handlesEphi: z.boolean(),
+  securityOfficerName: z.string(),
+  securityOfficerTitle: z.string(),
+});
+
 export const fullFormSchema = z.object({
   employer: employerSchema,
   plan: planSchema,
   benefits: benefitsSchema,
   elections: electionsSchema,
   contacts: contactsSchema,
+  hipaa: hipaaSchema,
 });

@@ -53,6 +53,15 @@ export interface PlanBenefits {
   groupDental: boolean;
   groupVision: boolean;
   groupTermLife: boolean;
+  hsa: boolean;
+}
+
+export interface HIPAADesignation {
+  privacyOfficerName: string;
+  privacyOfficerTitle: string;
+  handlesEphi: boolean;
+  securityOfficerName: string;
+  securityOfficerTitle: string;
 }
 
 export interface ElectionOptions {
@@ -81,6 +90,7 @@ export interface FormData {
   benefits: PlanBenefits;
   elections: ElectionOptions;
   contacts: ContactInfo;
+  hipaa: HIPAADesignation;
   cafeteria?: CafeteriaConfig;
 }
 

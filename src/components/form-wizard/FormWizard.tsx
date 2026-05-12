@@ -7,6 +7,7 @@ import { StepEmployerInfo } from "./StepEmployerInfo";
 import { StepPlanInfo } from "./StepPlanInfo";
 import { StepBenefits } from "./StepBenefits";
 import { StepElections } from "./StepElections";
+import { StepHIPAA } from "./StepHIPAA";
 import { StepContacts } from "./StepContacts";
 import { StepReview } from "./StepReview";
 import { StepCafePlanIdentity } from "./cafeteria/StepPlanIdentity";
@@ -53,6 +54,7 @@ const defaultFormData: FormData = {
     groupDental: false,
     groupVision: false,
     groupTermLife: false,
+    hsa: false,
   },
   elections: {
     employeeElections: "first_year_only",
@@ -63,6 +65,13 @@ const defaultFormData: FormData = {
   },
   contacts: {
     primaryContact: { name: "", email: "", phone: "" },
+  },
+  hipaa: {
+    privacyOfficerName: "",
+    privacyOfficerTitle: "",
+    handlesEphi: false,
+    securityOfficerName: "",
+    securityOfficerTitle: "",
   },
 };
 
@@ -174,6 +183,18 @@ export function FormWizard({ initialData, editId, existingDocuments = [] }: Form
           <StepBenefits
             data={formData.benefits}
             onChange={(d) => updateFormData("benefits", d)}
+            onNext={next}
+            onBack={back}
+          />
+        ),
+      });
+      list.push({
+        key: "hipaa",
+        label: "HIPAA",
+        render: () => (
+          <StepHIPAA
+            data={formData.hipaa}
+            onChange={(d) => updateFormData("hipaa", d)}
             onNext={next}
             onBack={back}
           />

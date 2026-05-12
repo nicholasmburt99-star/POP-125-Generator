@@ -51,6 +51,7 @@ export function benefitsList(benefits: PlanBenefits): string[] {
   if (benefits.groupDental) list.push("Group Dental Plan");
   if (benefits.groupVision) list.push("Group Vision Plan");
   if (benefits.groupTermLife) list.push("Employer Group Term Life (up to $50,000 of coverage on a pre-tax basis)");
+  if (benefits.hsa) list.push("Health Savings Account (HSA) — Pre-tax salary reduction contributions to an employee’s HSA, subject to the requirements of Code Section 223 and Article IV §05 of this Plan");
   return list;
 }
 

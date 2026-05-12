@@ -77,13 +77,19 @@ export function StepReview({
   generating,
   duplicateMatch,
 }: Props) {
-  const { employer, plan, benefits, elections, contacts } = formData;
+  const { employer, plan, benefits, elections, contacts, hipaa } = formData;
+  const isPop = plan.planType === "pop";
+  // Step indices shift when HIPAA step is inserted on the POP path.
+  const hipaaStep = 3;
+  const electionsStep = isPop ? 4 : 3;
+  const contactsStep = isPop ? 5 : 4;
 
   const benefitList = [
     benefits.groupMedical && "Group Medical",
     benefits.groupDental && "Group Dental",
     benefits.groupVision && "Group Vision",
     benefits.groupTermLife && "Group Term Life (up to $50K pre-tax)",
+    benefits.hsa && "HSA (pre-tax HDHP-paired)",
   ]
     .filter(Boolean)
     .join(", ");
@@ -140,7 +146,31 @@ export function StepReview({
         <Row label="Benefits" value={benefitList} />
       </Section>
 
-      <Section title="Elections & Options" step={3} onEdit={onGoToStep}>
+      {isPop && (
+        <Section title="HIPAA Privacy and Security Officer" step={hipaaStep} onEdit={onGoToStep}>
+          <Row
+            label="Privacy Officer"
+            value={
+              hipaa.privacyOfficerName
+                ? `${hipaa.privacyOfficerName}${hipaa.privacyOfficerTitle ? ` (${hipaa.privacyOfficerTitle})` : ""}`
+                : "Not provided"
+            }
+          />
+          <Row label="Plan handles ePHI" value={hipaa.handlesEphi ? "Yes" : "No"} />
+          {hipaa.handlesEphi && (
+            <Row
+              label="Security Officer"
+              value={
+                hipaa.securityOfficerName
+                  ? `${hipaa.securityOfficerName}${hipaa.securityOfficerTitle ? ` (${hipaa.securityOfficerTitle})` : ""}`
+                  : "Not provided"
+              }
+            />
+          )}
+        </Section>
+      )}
+
+      <Section title="Elections & Options" step={electionsStep} onEdit={onGoToStep}>
         <Row
           label="Employee Elections"
           value={
@@ -165,7 +195,7 @@ export function StepReview({
         />
       </Section>
 
-      <Section title="Contacts" step={4} onEdit={onGoToStep}>
+      <Section title="Contacts" step={contactsStep} onEdit={onGoToStep}>
         <Row
           label="Primary Contact"
           value={`${contacts.primaryContact.name} (${contacts.primaryContact.email})`}

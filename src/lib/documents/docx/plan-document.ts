@@ -165,6 +165,7 @@ export function buildPlanDocumentParagraphs(data: FormData): Paragraph[] {
 
   p.push(sectionTitle("04. Non-Tax Dependent Coverage"));
   p.push(body(`If (i) Employee Salary Redirections are made to fund Benefits under the Plan, and (ii) the Employer allows a Participant to elect to cover a Non-Tax Dependent through the Participant\u2019s coverage under group Medical, Dental or Vision benefit(s), a Participant who elects to participate in the Salary Redirection program may pay on a pre-tax basis through salary reduction contributions the Participant\u2019s portion of the premium cost of coverage under the Employer\u2019s Medical, Dental or Vision Benefits, provided that the full fair market value of such Medical, Dental or Vision coverage for any such Non-Tax Dependent shall be includible in the Participant\u2019s gross income as a taxable benefit in accordance with applicable federal income tax rules. For purposes of this Plan, the Participant electing coverage for Non-Tax Dependent(s) shall be treated as receiving, at the time that coverage is received, cash compensation equal to the full fair market value of such coverage and then as having purchased the coverage with after-tax employee contributions.`));
+  p.push(body(`The Administrator shall determine the fair market value of Non-Tax Dependent coverage using a reasonable method, which shall typically be (i) the additional employee cost charged by the underlying Insurance Contract for adding the Non-Tax Dependent to coverage, (ii) the carrier\u2019s published rate for non-spouse or non-tax-dependent enrollees in the applicable coverage tier, or (iii) the COBRA equivalent rate for the applicable coverage tier. The Administrator shall report the imputed income amount on the Participant\u2019s Form W-2 (Box 1, and as applicable, Boxes 3 and 5 for FICA), shall withhold federal and state income taxes and FICA on the imputed amount, and shall coordinate the federal imputed income treatment with applicable state income tax imputation requirements (including, for California-resident Participants, the requirements of the California Revenue and Taxation Code addressing imputed income for registered domestic partners and similar coverage relationships). The Administrator shall notify each affected Participant of the imputed income amount applied to such Participant\u2019s coverage no less frequently than annually.`));
 
   p.push(sectionTitle("05. Health Savings Account Compatibility"));
   p.push(body(`To the extent the Employer offers a high-deductible health plan (\u201cHDHP\u201d) that meets the requirements of Code Section 223(c)(2) as one of the Insurance Contracts available under the Plan, an Eligible Employee who is enrolled in such HDHP and who is otherwise eligible to contribute to a Health Savings Account (\u201cHSA\u201d) under Code Section 223 may also elect, through a Salary Redirection under this Plan, to make pre-tax contributions to an HSA established and maintained for the Employee\u2019s benefit, subject to the annual statutory contribution limits set forth in Code Section 223(b).`));
@@ -396,6 +397,40 @@ export function buildPlanDocumentParagraphs(data: FormData): Paragraph[] {
   p.push(body(`The undersigned further certifies that attached hereto as Exhibits, are true copies of ${name}\u2019s Benefit Plan Document and Summary Plan Description approved and adopted at this meeting.`));
   p.push(emptyLine());
   p.push(bodyBold(`Company: ${name}`));
+  p.push(...signatureBlock(name));
+
+  // ========== APPENDIX A \u2014 HIPAA PRIVACY AND SECURITY OFFICER DESIGNATION ==========
+  const hipaa = data.hipaa;
+  p.push(pageBreak());
+  p.push(articleHeading("APPENDIX A \u2014 HIPAA PRIVACY AND SECURITY OFFICER DESIGNATION"));
+  p.push(horizontalRule());
+  p.push(emptyLine());
+  p.push(body(`Pursuant to Article VIII, Section 15 of this Plan, the Health Insurance Portability and Accountability Act of 1996 ("HIPAA") Privacy Rule (45 C.F.R. \u00a7164.530(a)) and Security Rule (45 C.F.R. \u00a7164.308(a)(2)), the Plan Administrator hereby designates the following individuals to serve as the Plan\u2019s Privacy Officer and, where applicable, Security Officer:`));
+  p.push(emptyLine());
+  p.push(bodyBold("Privacy Officer"));
+  p.push(body(`Name:  ${hipaa?.privacyOfficerName || "_______________________________________"}`));
+  p.push(body(`Title: ${hipaa?.privacyOfficerTitle || "_______________________________________"}`));
+  p.push(body(`The Privacy Officer is responsible for the development, implementation, and ongoing oversight of the Plan\u2019s policies and procedures for the use and disclosure of protected health information ("PHI"), the rights of individuals with respect to their PHI, workforce training on HIPAA Privacy requirements, and the response to any breach of unsecured PHI under 45 C.F.R. Part 164, Subpart D.`));
+  p.push(emptyLine());
+
+  if (hipaa?.handlesEphi) {
+    p.push(bodyBold("Security Officer"));
+    p.push(body(`Name:  ${hipaa.securityOfficerName || "_______________________________________"}`));
+    p.push(body(`Title: ${hipaa.securityOfficerTitle || "_______________________________________"}`));
+    p.push(body(`Because the Plan creates, receives, maintains, or transmits electronic protected health information ("ePHI"), the Plan Administrator further designates a Security Officer responsible for the administrative, physical, and technical safeguards required by 45 C.F.R. Part 164, Subpart C, including the assignment of unique user identifiers, the implementation of access controls and audit logs, the conduct of security risk analyses, and the development of an incident response plan.`));
+  } else {
+    p.push(bodyBold("Security Officer"));
+    p.push(body(`The Plan Administrator has determined that the Plan does not create, receive, maintain, or transmit electronic protected health information ("ePHI"). Accordingly, the designation of a separate Security Officer is not required at this time. The Plan Administrator shall designate a Security Officer in writing if and when the Plan\u2019s ePHI status changes (for example, upon implementation of an electronic enrollment portal, electronic file transfers with a third-party administrator, or other electronic handling of PHI).`));
+  }
+  p.push(emptyLine());
+
+  p.push(bodyBold("Business Associate Agreements"));
+  p.push(body(`The Plan Administrator further confirms that the Plan has executed (or will execute prior to disclosure of PHI) a written Business Associate Agreement satisfying the requirements of 45 C.F.R. \u00a7164.504(e) and \u00a7164.314(a) with each third-party administrator, insurance carrier, broker, consultant, or other service provider that creates, receives, maintains, or transmits PHI on behalf of the Plan.`));
+  p.push(emptyLine());
+
+  p.push(body(`This designation is made by the Plan Administrator on behalf of the Plan and shall remain in effect until amended or rescinded in writing.`));
+  p.push(emptyLine());
+  p.push(bodyBold(`Plan: ${name} Premium Only Plan`));
   p.push(...signatureBlock(name));
 
   return p;
