@@ -41,7 +41,7 @@ const ASSISTANCE_PARAGRAPHS = [
 ];
 
 const INTRO_PARAGRAPH =
-  "As a Participant in the Plan, you are entitled to certain rights and protections under the Employee Retirement Income Security Act of 1974 (“ERISA”). ERISA provides that all Plan Participants shall be entitled to:";
+  "The ERISA rights described below apply to the underlying group medical, dental, vision, life, and other welfare benefit plans through which you receive coverage. The cafeteria plan (whether designated as a Premium Only Plan or a full Cafeteria Plan under Code Section 125) itself is not an employee welfare benefit plan subject to ERISA. As a Participant in the Plan, you are entitled to certain rights and protections under the Employee Retirement Income Security Act of 1974 (“ERISA”). ERISA provides that all Plan Participants shall be entitled to:";
 
 // --- DOCX builder ---
 

@@ -43,7 +43,7 @@ export function buildSPDPDFSections(data: FormData): PDFSection[] {
       sectionTitle(ctx, "01. How Does This Plan Operate?");
       bodyText(ctx, "You may elect to have salary contributed to the Plan to pay for benefits on a pre-tax basis, reducing your State and Federal income and Social Security taxes.");
       sectionTitle(ctx, "02. What Happens to Contributions?");
-      bodyText(ctx, "Contributions are used to pay your portion of employer-sponsored benefit coverage. Unused amounts are forfeited.");
+      bodyText(ctx, "Contributions deducted from your paycheck are remitted to the insurance carrier to pay your portion of employer-sponsored benefit coverage. If you cease participation and any Salary Redirections have been withheld but not yet remitted to the carrier for a future period of coverage, those amounts will be refunded to you in accordance with the Plan and applicable law.");
       sectionTitle(ctx, "03. Election Period");
       bodyText(ctx, "Your initial election period starts on the date you meet eligibility requirements and ends 30 days thereafter.");
       sectionTitle(ctx, "04. May I Change Elections During the Plan Year?");
@@ -64,7 +64,7 @@ export function buildSPDPDFSections(data: FormData): PDFSection[] {
       sectionTitle(ctx, "07. Social Security Impact");
       bodyText(ctx, "Your Social Security benefits may be slightly reduced due to pre-tax contributions.");
       sectionTitle(ctx, "08. Termination of Employment");
-      bodyText(ctx, "You remain covered only for the period for which premiums have been paid. Unused amounts are forfeited.");
+      bodyText(ctx, "You remain covered only for the period for which premiums have been paid. Any Salary Redirection amounts withheld but not yet remitted to the carrier for a period of coverage beginning on or after your termination date will be refunded to you.");
       sectionTitle(ctx, "09. Qualified Medical Child Support Order");
       bodyText(ctx, "A medical child support order is a judgment, decree or order made under state law that provides for child support or health coverage for the child of a Participant. You may obtain, without charge, a copy of the procedures governing the determination of qualified medical child support orders from the Plan Administrator.");
       sectionTitle(ctx, "10. What Are My Rights to Continue Coverage Under COBRA?");
