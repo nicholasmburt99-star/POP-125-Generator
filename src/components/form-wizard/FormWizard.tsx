@@ -94,11 +94,35 @@ interface FormWizardProps {
   existingDocuments?: ExistingDocumentSummary[];
 }
 
+// Backfill any fields that may be missing from legacy form-data records saved
+// before a field was added (e.g., benefits.hsa, hipaa). Run this on every seed
+// so Edit & Regenerate of an older document doesn't crash on undefined access.
+function hydrateLegacyFormData(data: FormData): FormData {
+  const b = data.benefits ?? ({} as Partial<FormData["benefits"]>);
+  return {
+    ...data,
+    benefits: {
+      groupMedical: b.groupMedical ?? false,
+      groupDental: b.groupDental ?? false,
+      groupVision: b.groupVision ?? false,
+      groupTermLife: b.groupTermLife ?? false,
+      hsa: b.hsa ?? false,
+    },
+    hipaa: data.hipaa ?? {
+      privacyOfficerName: "",
+      privacyOfficerTitle: "",
+      handlesEphi: false,
+      securityOfficerName: "",
+      securityOfficerTitle: "",
+    },
+  };
+}
+
 export function FormWizard({ initialData, editId, existingDocuments = [] }: FormWizardProps = {}) {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState<FormData>(() => {
-    const seed = initialData || defaultFormData;
+    const seed = hydrateLegacyFormData(initialData || defaultFormData);
     // Ensure cafeteria config exists if planType is cafeteria
     if (seed.plan.planType === "cafeteria" && !seed.cafeteria) {
       return { ...seed, cafeteria: emptyCafeteriaConfig() };
