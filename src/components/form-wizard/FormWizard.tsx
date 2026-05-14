@@ -8,6 +8,7 @@ import { StepPlanInfo } from "./StepPlanInfo";
 import { StepBenefits } from "./StepBenefits";
 import { StepElections } from "./StepElections";
 import { StepHIPAA } from "./StepHIPAA";
+import { StepInsurancePolicies } from "./StepInsurancePolicies";
 import { StepContacts } from "./StepContacts";
 import { StepReview } from "./StepReview";
 import { StepCafePlanIdentity } from "./cafeteria/StepPlanIdentity";
@@ -40,6 +41,7 @@ const defaultFormData: FormData = {
     stateOfGoverningLaw: "",
     fiscalYearEnd: "",
     hasAffiliatedEmployers: false,
+    numberOfEmployees: "",
   },
   plan: {
     planType: "pop",
@@ -64,7 +66,7 @@ const defaultFormData: FormData = {
     includeFmlaLanguage: false,
   },
   contacts: {
-    primaryContact: { name: "", email: "", phone: "" },
+    primaryContact: { name: "", email: "", phone: "", title: "" },
   },
   hipaa: {
     privacyOfficerName: "",
@@ -73,6 +75,7 @@ const defaultFormData: FormData = {
     securityOfficerName: "",
     securityOfficerTitle: "",
   },
+  insurancePolicies: [],
 };
 
 interface StepDescriptor {
@@ -101,6 +104,10 @@ function hydrateLegacyFormData(data: FormData): FormData {
   const b = data.benefits ?? ({} as Partial<FormData["benefits"]>);
   return {
     ...data,
+    employer: {
+      ...data.employer,
+      numberOfEmployees: data.employer?.numberOfEmployees ?? "",
+    },
     benefits: {
       groupMedical: b.groupMedical ?? false,
       groupDental: b.groupDental ?? false,
@@ -115,6 +122,7 @@ function hydrateLegacyFormData(data: FormData): FormData {
       securityOfficerName: "",
       securityOfficerTitle: "",
     },
+    insurancePolicies: data.insurancePolicies ?? [],
   };
 }
 
@@ -207,6 +215,18 @@ export function FormWizard({ initialData, editId, existingDocuments = [] }: Form
           <StepBenefits
             data={formData.benefits}
             onChange={(d) => updateFormData("benefits", d)}
+            onNext={next}
+            onBack={back}
+          />
+        ),
+      });
+      list.push({
+        key: "policies",
+        label: "Policies",
+        render: () => (
+          <StepInsurancePolicies
+            data={formData.insurancePolicies}
+            onChange={(d) => updateFormData("insurancePolicies", d)}
             onNext={next}
             onBack={back}
           />
@@ -403,6 +423,18 @@ export function FormWizard({ initialData, editId, existingDocuments = [] }: Form
           <StepCafeMisc
             data={cafe.misc}
             onChange={(d) => updateCafeteria("misc", d)}
+            onNext={next}
+            onBack={back}
+          />
+        ),
+      });
+      list.push({
+        key: "policies",
+        label: "Policies",
+        render: () => (
+          <StepInsurancePolicies
+            data={formData.insurancePolicies}
+            onChange={(d) => updateFormData("insurancePolicies", d)}
             onNext={next}
             onBack={back}
           />

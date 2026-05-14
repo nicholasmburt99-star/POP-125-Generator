@@ -1,5 +1,6 @@
 import { Paragraph } from "docx";
 import type { FormData } from "@/types";
+import { COVERAGE_TYPE_LABELS } from "@/types";
 import {
   coverPage,
   articleHeading,
@@ -54,6 +55,7 @@ export function buildSPDParagraphs(data: FormData): Paragraph[] {
     body(`5. Plan Number: 501.`),
     body(`6. Type of Plan: Premium Only Plan under Section 125 of the Internal Revenue Code.`),
     body(`7. Type of Plan Administration: Employer Administration.`),
+    body(`8. Number of Employees: ${data.employer.numberOfEmployees || "Not provided"}.`),
     emptyLine(),
 
     sectionTitle("ERISA Status"),
@@ -76,6 +78,14 @@ export function buildSPDParagraphs(data: FormData): Paragraph[] {
     body(addr1),
     body(addr2),
     body(`Federal Employer I.D. Number: ${ein}`),
+    ...(data.contacts.primaryContact.name
+      ? [
+          body(
+            `Plan Administrator Contact: ${data.contacts.primaryContact.name}${data.contacts.primaryContact.title ? `, ${data.contacts.primaryContact.title}` : ""}`,
+          ),
+          body(`Email: ${data.contacts.primaryContact.email}    Phone: ${data.contacts.primaryContact.phone}`),
+        ]
+      : []),
     emptyLine(),
     body(`The Administrator keeps the records for the Plan and is responsible for the administration of the Plan. The Administrator will also answer any questions you may have about the Plan.`),
     emptyLine(),
@@ -89,6 +99,18 @@ export function buildSPDParagraphs(data: FormData): Paragraph[] {
     body(`Federal Employer I.D. Number: ${ein}`),
     emptyLine(),
     body("The type of Plan administration is Employer Administration."),
+    emptyLine(),
+
+    sectionTitle("In-Force Insurance Plans"),
+    body(`This Plan facilitates pre-tax payment of premiums for the following Employer-sponsored welfare benefit plans, each of which is a separate ERISA-governed welfare benefit plan (where applicable). For full plan details, refer to the policy documents and Summary of Benefits and Coverage (SBC) provided by each carrier.`),
+    emptyLine(),
+    ...(data.insurancePolicies.length === 0
+      ? [body("No in-force insurance plans have been documented in this Summary Plan Description. Contact the Plan Administrator for current plan details.")]
+      : data.insurancePolicies.map((p) => {
+          const ctLabel = p.coverageType === "other" && p.coverageTypeOther ? p.coverageTypeOther : COVERAGE_TYPE_LABELS[p.coverageType];
+          const eff = p.effectiveDate ? formatDate(p.effectiveDate) : "(effective date not provided)";
+          return body(`${ctLabel} — Carrier: ${p.carrierName || "(carrier not provided)"}; Policy No.: ${p.policyNumber || "(not provided)"}; Effective: ${eff}.`);
+        })),
     pageBreak(),
 
     // PLAN DETAILS

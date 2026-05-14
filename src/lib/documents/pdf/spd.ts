@@ -1,4 +1,5 @@
 import type { FormData } from "@/types";
+import { COVERAGE_TYPE_LABELS } from "@/types";
 import type { PDFSection } from "./pdf-builder";
 import { coverPage, articleHeading, sectionTitle, bodyText, bulletItem, emptyLine } from "./pdf-builder";
 import { formatDate, formatMonthDay, benefitsList } from "../helpers";
@@ -29,6 +30,7 @@ export function buildSPDPDFSections(data: FormData): PDFSection[] {
       bodyText(ctx, "5. Plan Number: 501.");
       bodyText(ctx, "6. Type of Plan: Premium Only Plan under Section 125 of the Internal Revenue Code.");
       bodyText(ctx, "7. Type of Plan Administration: Employer Administration.");
+      bodyText(ctx, `8. Number of Employees: ${data.employer.numberOfEmployees || "Not provided"}.`);
       emptyLine(ctx);
       sectionTitle(ctx, "ERISA Status");
       bodyText(ctx, "This Plan is a cafeteria plan under Section 125 of the Internal Revenue Code. The Premium Only Plan itself is not an employee welfare benefit plan subject to the Employee Retirement Income Security Act of 1974, as amended (“ERISA”). However, the underlying group medical, dental, vision, or other welfare benefits that you may pay for on a pre-tax basis through this Plan are generally separate employee welfare benefit plans subject to ERISA, and are governed by the policies, certificates, and plan documents issued for those benefits. Your ERISA rights with respect to the underlying group health, dental, and vision plans are described in the Statement of ERISA Rights set forth at the end of this Summary Plan Description and in the Summary Plan Descriptions for those underlying plans, which you may obtain from the Plan Administrator.");
@@ -37,6 +39,23 @@ export function buildSPDPDFSections(data: FormData): PDFSection[] {
       bodyText(ctx, name, { bold: true });
       bodyText(ctx, `${addr1}, ${addr2}`);
       bodyText(ctx, `Federal Employer I.D. Number: ${ein}`);
+      if (data.contacts.primaryContact.name) {
+        bodyText(ctx, `Plan Administrator Contact: ${data.contacts.primaryContact.name}${data.contacts.primaryContact.title ? `, ${data.contacts.primaryContact.title}` : ""}`);
+        bodyText(ctx, `Email: ${data.contacts.primaryContact.email}    Phone: ${data.contacts.primaryContact.phone}`);
+      }
+      emptyLine(ctx);
+
+      sectionTitle(ctx, "In-Force Insurance Plans");
+      bodyText(ctx, "This Plan facilitates pre-tax payment of premiums for the following Employer-sponsored welfare benefit plans, each of which is a separate ERISA-governed welfare benefit plan (where applicable). For full plan details, refer to the policy documents and Summary of Benefits and Coverage (SBC) provided by each carrier.");
+      if (data.insurancePolicies.length === 0) {
+        bodyText(ctx, "No in-force insurance plans have been documented in this Summary Plan Description. Contact the Plan Administrator for current plan details.");
+      } else {
+        data.insurancePolicies.forEach((p) => {
+          const ctLabel = p.coverageType === "other" && p.coverageTypeOther ? p.coverageTypeOther : COVERAGE_TYPE_LABELS[p.coverageType];
+          const eff = p.effectiveDate ? formatDate(p.effectiveDate) : "(effective date not provided)";
+          bodyText(ctx, `${ctLabel} — Carrier: ${p.carrierName || "(carrier not provided)"}; Policy No.: ${p.policyNumber || "(not provided)"}; Effective: ${eff}.`);
+        });
+      }
     }},
     { build: (ctx) => {
       articleHeading(ctx, "Plan Details");

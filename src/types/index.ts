@@ -12,6 +12,7 @@ export interface EmployerInfo {
   stateOfGoverningLaw: string;
   fiscalYearEnd: string;
   hasAffiliatedEmployers: boolean;
+  numberOfEmployees: string;
 }
 
 export type EntityType =
@@ -82,6 +83,37 @@ export interface Contact {
   name: string;
   email: string;
   phone: string;
+  title?: string;
+}
+
+export type CoverageType =
+  | "medical"
+  | "dental"
+  | "vision"
+  | "life"
+  | "std"
+  | "ltd"
+  | "ad_d"
+  | "other";
+
+export const COVERAGE_TYPE_LABELS: Record<CoverageType, string> = {
+  medical: "Medical",
+  dental: "Dental",
+  vision: "Vision",
+  life: "Group Term Life",
+  std: "Short-Term Disability",
+  ltd: "Long-Term Disability",
+  ad_d: "Accidental Death & Dismemberment",
+  other: "Other",
+};
+
+export interface InsurancePolicy {
+  id: string;
+  carrierName: string;
+  policyNumber: string;
+  coverageType: CoverageType;
+  coverageTypeOther: string;
+  effectiveDate: string;
 }
 
 export interface FormData {
@@ -91,6 +123,7 @@ export interface FormData {
   elections: ElectionOptions;
   contacts: ContactInfo;
   hipaa: HIPAADesignation;
+  insurancePolicies: InsurancePolicy[];
   cafeteria?: CafeteriaConfig;
 }
 

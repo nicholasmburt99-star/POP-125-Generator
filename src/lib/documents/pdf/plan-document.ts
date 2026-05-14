@@ -5,6 +5,7 @@ import {
   bodyText, bulletItem, signatureBlock, emptyLine,
 } from "./pdf-builder";
 import { formatDate, formatMonthDay, stateName, entityLabel, benefitsList } from "../helpers";
+import { COVERAGE_TYPE_LABELS } from "@/types";
 import { getCobraPDFBuilder } from "../legal-text/cobra";
 import { getFmlaUserraPDFBuilder } from "../legal-text/fmla-userra";
 import { getQmcsoPDFBuilder } from "../legal-text/qmcso";
@@ -335,6 +336,31 @@ export function buildPlanDocumentPDFSections(data: FormData): PDFSection[] {
       bodyText(ctx, "This designation is made by the Plan Administrator on behalf of the Plan and shall remain in effect until amended or rescinded in writing.");
       emptyLine(ctx);
       bodyText(ctx, `Plan: ${name} Premium Only Plan`, { bold: true });
+      signatureBlock(ctx, name);
+    }},
+
+    // Exhibit B — Underlying ERISA Welfare Benefit Plans
+    { build: (ctx) => {
+      articleHeading(ctx, "EXHIBIT B — UNDERLYING ERISA WELFARE BENEFIT PLANS");
+      bodyText(ctx, "The following Employer-sponsored welfare benefit plans are paid for, in whole or in part, through pre-tax Salary Redirections under this Plan. Each underlying plan is administered pursuant to the terms of its applicable Insurance Contract or self-funded plan document. To the extent any of the following plans is a “welfare benefit plan” within the meaning of Section 3(1) of ERISA, that plan is governed by ERISA and is subject to ERISA's reporting, disclosure, fiduciary, and continuation coverage requirements. This Plan (the cafeteria plan vehicle) is not itself an ERISA plan.");
+      emptyLine(ctx);
+
+      if (data.insurancePolicies.length === 0) {
+        bodyText(ctx, "To be completed by the Plan Administrator. Attach a schedule listing each underlying welfare benefit plan, including carrier name, policy number, coverage type, and effective date, and update this Exhibit at each renewal.");
+      } else {
+        data.insurancePolicies.forEach((policy) => {
+          const ctLabel = policy.coverageType === "other" && policy.coverageTypeOther
+            ? policy.coverageTypeOther
+            : COVERAGE_TYPE_LABELS[policy.coverageType];
+          bodyText(ctx, ctLabel, { bold: true });
+          bodyText(ctx, `Carrier: ${policy.carrierName || "(not provided)"}`);
+          bodyText(ctx, `Policy Number: ${policy.policyNumber || "(not provided)"}`);
+          bodyText(ctx, `Effective Date: ${policy.effectiveDate ? formatDate(policy.effectiveDate) : "(not provided)"}`);
+          emptyLine(ctx);
+        });
+      }
+
+      bodyText(ctx, "Attested by the Plan Administrator on behalf of the Plan:");
       signatureBlock(ctx, name);
     }},
   ];

@@ -19,11 +19,13 @@ function ContactFields({
   contact,
   onChange,
   prefix,
+  showTitle = false,
 }: {
   label: string;
   contact: Contact;
   onChange: (c: Contact) => void;
   prefix: string;
+  showTitle?: boolean;
 }) {
   return (
     <div className="space-y-3 rounded-lg border p-4">
@@ -38,6 +40,17 @@ function ContactFields({
             required
           />
         </div>
+        {showTitle && (
+          <div className="space-y-1">
+            <Label htmlFor={`${prefix}-title`}>Title</Label>
+            <Input
+              id={`${prefix}-title`}
+              value={contact.title ?? ""}
+              onChange={(e) => onChange({ ...contact, title: e.target.value })}
+              placeholder="VP Human Resources"
+            />
+          </div>
+        )}
         <div className="space-y-1">
           <Label htmlFor={`${prefix}-email`}>Email</Label>
           <Input
@@ -80,6 +93,7 @@ export function StepContacts({ data, onChange, onNext, onBack }: Props) {
         contact={data.primaryContact}
         onChange={(c) => onChange({ ...data, primaryContact: c })}
         prefix="primary"
+        showTitle
       />
 
       <div className="flex items-center space-x-3">

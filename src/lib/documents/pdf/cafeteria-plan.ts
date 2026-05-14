@@ -1,9 +1,10 @@
 import type { FormData, EntityType } from "@/types";
-import { ENTITY_TYPE_LABELS } from "@/types";
+import { ENTITY_TYPE_LABELS, COVERAGE_TYPE_LABELS } from "@/types";
 import type { PDFSection } from "./pdf-builder";
 import {
   bodyText, signatureBlock, emptyLine,
   centered, checkboxLine, numberedLine, legalSection, subheading, noteText,
+  articleHeading,
 } from "./pdf-builder";
 import { formatDate, formatMonthDay, stateName } from "../helpers";
 import { getCobraPDFBuilder } from "../legal-text/cobra";
@@ -599,6 +600,28 @@ export function buildCafeteriaPlanPDFSections(data: FormData): PDFSection[] {
       bodyText(ctx, "The Plan shall consist of this Adoption Agreement and the related Summary Plan Description, together with any Appendix or Addendum to the Adoption Agreement, all of which are incorporated herein by reference.");
       emptyLine(ctx);
       bodyText(ctx, `The undersigned agrees to be bound by the terms of this Adoption Agreement and acknowledges receipt of same. The Plan Sponsor caused this Plan to be executed this ____ day of ____________________, ${effective.split(", ")[1] || "20__"}.`);
+      signatureBlock(ctx, name);
+    }},
+
+    // Exhibit B — Underlying ERISA Welfare Benefit Plans
+    { build: (ctx) => {
+      articleHeading(ctx, "EXHIBIT B — UNDERLYING ERISA WELFARE BENEFIT PLANS");
+      bodyText(ctx, "The following Employer-sponsored welfare benefit plans are paid for, in whole or in part, through pre-tax Salary Redirections under this Plan. Each underlying plan is administered pursuant to the terms of its applicable Insurance Contract or self-funded plan document. To the extent any of the following plans is a “welfare benefit plan” within the meaning of Section 3(1) of ERISA, that plan is governed by ERISA and is subject to ERISA's reporting, disclosure, fiduciary, and continuation coverage requirements. This Plan (the cafeteria plan vehicle) is not itself an ERISA plan.");
+      emptyLine(ctx);
+
+      if (data.insurancePolicies.length === 0) {
+        bodyText(ctx, "To be completed by the Plan Administrator. Attach a schedule listing each underlying welfare benefit plan, including carrier name, policy number, coverage type, and effective date, and update this Exhibit at each renewal.");
+      } else {
+        data.insurancePolicies.forEach((policy) => {
+          const ctLabel = policy.coverageType === "other" && policy.coverageTypeOther ? policy.coverageTypeOther : COVERAGE_TYPE_LABELS[policy.coverageType];
+          bodyText(ctx, ctLabel, { bold: true });
+          bodyText(ctx, `Carrier: ${policy.carrierName || "(not provided)"}`);
+          bodyText(ctx, `Policy Number: ${policy.policyNumber || "(not provided)"}`);
+          bodyText(ctx, `Effective Date: ${policy.effectiveDate ? formatDate(policy.effectiveDate) : "(not provided)"}`);
+          emptyLine(ctx);
+        });
+      }
+      bodyText(ctx, "Attested by the Plan Administrator on behalf of the Plan:");
       signatureBlock(ctx, name);
     }},
   ];

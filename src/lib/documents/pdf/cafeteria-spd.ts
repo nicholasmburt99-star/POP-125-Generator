@@ -1,4 +1,5 @@
 import type { FormData } from "@/types";
+import { COVERAGE_TYPE_LABELS } from "@/types";
 import type { PDFSection } from "./pdf-builder";
 import {
   coverPage,
@@ -56,6 +57,7 @@ export function buildCafeteriaSPDPDFSections(data: FormData): PDFSection[] {
       bodyText(ctx, "Type of Plan Administration: Employer Administration.");
       bodyText(ctx, "Plan Number: 501");
       bodyText(ctx, "Funding: This Plan is unfunded. Benefits are paid from the general assets of the Employer and from Participant pre-tax contributions.");
+      bodyText(ctx, `Number of Employees: ${data.employer.numberOfEmployees || "Not provided"}`);
       emptyLine(ctx);
 
       sectionTitle(ctx, "Plan Sponsor / Employer");
@@ -70,6 +72,10 @@ export function buildCafeteriaSPDPDFSections(data: FormData): PDFSection[] {
       bodyText(ctx, addr1);
       bodyText(ctx, addr2);
       bodyText(ctx, `Federal Employer I.D. Number: ${ein}`);
+      if (data.contacts.primaryContact.name) {
+        bodyText(ctx, `Plan Administrator Contact: ${data.contacts.primaryContact.name}${data.contacts.primaryContact.title ? `, ${data.contacts.primaryContact.title}` : ""}`);
+        bodyText(ctx, `Email: ${data.contacts.primaryContact.email}    Phone: ${data.contacts.primaryContact.phone}`);
+      }
       bodyText(ctx, "The Plan Administrator keeps the records for the Plan and is responsible for the administration of the Plan. The Plan Administrator will also answer any questions you may have about the Plan.");
       emptyLine(ctx);
 
@@ -78,6 +84,19 @@ export function buildCafeteriaSPDPDFSections(data: FormData): PDFSection[] {
       bodyText(ctx, addr1);
       bodyText(ctx, addr2);
       bodyText(ctx, "Service of legal process may also be made on the Plan Administrator.");
+      emptyLine(ctx);
+
+      sectionTitle(ctx, "In-Force Insurance Plans");
+      bodyText(ctx, "This Plan facilitates pre-tax payment of premiums for the following Employer-sponsored welfare benefit plans, each of which is a separate ERISA-governed welfare benefit plan (where applicable). For full plan details, refer to the policy documents and Summary of Benefits and Coverage (SBC) provided by each carrier.");
+      if (data.insurancePolicies.length === 0) {
+        bodyText(ctx, "No in-force insurance plans have been documented in this Summary Plan Description. Contact the Plan Administrator for current plan details.");
+      } else {
+        data.insurancePolicies.forEach((policy) => {
+          const ctLabel = policy.coverageType === "other" && policy.coverageTypeOther ? policy.coverageTypeOther : COVERAGE_TYPE_LABELS[policy.coverageType];
+          const eff = policy.effectiveDate ? formatDate(policy.effectiveDate) : "(effective date not provided)";
+          bodyText(ctx, `${ctLabel} — Carrier: ${policy.carrierName || "(carrier not provided)"}; Policy No.: ${policy.policyNumber || "(not provided)"}; Effective: ${eff}.`);
+        });
+      }
     }},
 
     // Plan Details Q&A

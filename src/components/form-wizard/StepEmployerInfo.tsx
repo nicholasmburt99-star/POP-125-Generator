@@ -57,6 +57,23 @@ export function StepEmployerInfo({ data, onChange, onNext }: Props) {
           />
         </div>
 
+        <div className="space-y-2 col-span-2">
+          <Label htmlFor="numberOfEmployees">Total Number of Employees</Label>
+          <Input
+            id="numberOfEmployees"
+            type="number"
+            min={0}
+            value={data.numberOfEmployees}
+            onChange={(e) => update("numberOfEmployees", e.target.value)}
+            placeholder="e.g., 47"
+          />
+          <p className="text-xs text-gray-500">
+            Used to determine COBRA applicability (20+ FTE for federal COBRA; 2–19 for California
+            Cal-COBRA), Simple Cafeteria Plan eligibility (Code §125(j) limit of 100), and Form 5500
+            filing thresholds.
+          </p>
+        </div>
+
         <div className="space-y-2">
           <Label htmlFor="phone">Phone *</Label>
           <Input

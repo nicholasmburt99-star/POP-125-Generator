@@ -6,6 +6,7 @@ import {
   pageBreak, emptyLine, horizontalRule,
 } from "./docx-builder";
 import { formatDate, formatMonthDay, stateName, entityLabel, benefitsList } from "../helpers";
+import { COVERAGE_TYPE_LABELS } from "@/types";
 import { getCobraDocxParagraphs } from "../legal-text/cobra";
 import { getFmlaUserraDocxParagraphs } from "../legal-text/fmla-userra";
 import { getQmcsoDocxParagraphs } from "../legal-text/qmcso";
@@ -431,6 +432,32 @@ export function buildPlanDocumentParagraphs(data: FormData): Paragraph[] {
   p.push(body(`This designation is made by the Plan Administrator on behalf of the Plan and shall remain in effect until amended or rescinded in writing.`));
   p.push(emptyLine());
   p.push(bodyBold(`Plan: ${name} Premium Only Plan`));
+  p.push(...signatureBlock(name));
+
+  // ========== EXHIBIT B — UNDERLYING ERISA WELFARE BENEFIT PLANS ==========
+  p.push(pageBreak());
+  p.push(articleHeading("EXHIBIT B — UNDERLYING ERISA WELFARE BENEFIT PLANS"));
+  p.push(horizontalRule());
+  p.push(emptyLine());
+  p.push(body(`The following Employer-sponsored welfare benefit plans are paid for, in whole or in part, through pre-tax Salary Redirections under this Plan. Each underlying plan is administered pursuant to the terms of its applicable Insurance Contract or self-funded plan document. To the extent any of the following plans is a "welfare benefit plan" within the meaning of Section 3(1) of ERISA, that plan is governed by ERISA and is subject to ERISA's reporting, disclosure, fiduciary, and continuation coverage requirements. This Plan (the cafeteria plan vehicle) is not itself an ERISA plan.`));
+  p.push(emptyLine());
+
+  if (data.insurancePolicies.length === 0) {
+    p.push(body(`To be completed by the Plan Administrator. Attach a schedule listing each underlying welfare benefit plan, including carrier name, policy number, coverage type, and effective date, and update this Exhibit at each renewal.`));
+  } else {
+    data.insurancePolicies.forEach((policy) => {
+      const ctLabel = policy.coverageType === "other" && policy.coverageTypeOther
+        ? policy.coverageTypeOther
+        : COVERAGE_TYPE_LABELS[policy.coverageType];
+      p.push(bodyBold(ctLabel));
+      p.push(body(`Carrier: ${policy.carrierName || "(not provided)"}`));
+      p.push(body(`Policy Number: ${policy.policyNumber || "(not provided)"}`));
+      p.push(body(`Effective Date: ${policy.effectiveDate ? formatDate(policy.effectiveDate) : "(not provided)"}`));
+      p.push(emptyLine());
+    });
+  }
+
+  p.push(body(`Attested by the Plan Administrator on behalf of the Plan:`));
   p.push(...signatureBlock(name));
 
   return p;

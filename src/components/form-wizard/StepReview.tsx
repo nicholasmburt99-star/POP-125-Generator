@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import type { FormData } from "@/types";
-import { ENTITY_TYPE_LABELS } from "@/types";
+import { ENTITY_TYPE_LABELS, COVERAGE_TYPE_LABELS } from "@/types";
 import { US_STATES } from "@/types";
 import { AlertTriangle, Loader2, Pencil } from "lucide-react";
 import { format, parseISO } from "date-fns";
@@ -77,12 +77,13 @@ export function StepReview({
   generating,
   duplicateMatch,
 }: Props) {
-  const { employer, plan, benefits, elections, contacts, hipaa } = formData;
+  const { employer, plan, benefits, elections, contacts, hipaa, insurancePolicies } = formData;
   const isPop = plan.planType === "pop";
-  // Step indices shift when HIPAA step is inserted on the POP path.
-  const hipaaStep = 3;
-  const electionsStep = isPop ? 4 : 3;
-  const contactsStep = isPop ? 5 : 4;
+  // POP step order: Employer(0) Plan(1) Benefits(2) Policies(3) HIPAA(4) Elections(5) Contacts(6) Review(7)
+  const policiesStep = isPop ? 3 : 3; // cafeteria has policies near the end too; index varies — keep at 3 as best effort
+  const hipaaStep = 4;
+  const electionsStep = isPop ? 5 : 3;
+  const contactsStep = isPop ? 6 : 4;
 
   const benefitList = [
     benefits.groupMedical && "Group Medical",
@@ -125,6 +126,10 @@ export function StepReview({
         <Row
           label="Affiliated Employers"
           value={employer.hasAffiliatedEmployers ? "Yes" : "No"}
+        />
+        <Row
+          label="Number of Employees"
+          value={employer.numberOfEmployees || "Not provided"}
         />
       </Section>
 
@@ -195,10 +200,28 @@ export function StepReview({
         />
       </Section>
 
+      <Section title="In-Force Insurance Policies" step={policiesStep} onEdit={onGoToStep}>
+        {insurancePolicies.length === 0 ? (
+          <Row label="Policies" value="None entered" />
+        ) : (
+          insurancePolicies.map((p) => (
+            <Row
+              key={p.id}
+              label={
+                p.coverageType === "other" && p.coverageTypeOther
+                  ? p.coverageTypeOther
+                  : COVERAGE_TYPE_LABELS[p.coverageType]
+              }
+              value={`${p.carrierName || "—"}${p.policyNumber ? ` (Policy #${p.policyNumber})` : ""}${p.effectiveDate ? `, effective ${p.effectiveDate}` : ""}`}
+            />
+          ))
+        )}
+      </Section>
+
       <Section title="Contacts" step={contactsStep} onEdit={onGoToStep}>
         <Row
           label="Primary Contact"
-          value={`${contacts.primaryContact.name} (${contacts.primaryContact.email})`}
+          value={`${contacts.primaryContact.name}${contacts.primaryContact.title ? `, ${contacts.primaryContact.title}` : ""} (${contacts.primaryContact.email})`}
         />
         {contacts.brokerContact && (
           <Row

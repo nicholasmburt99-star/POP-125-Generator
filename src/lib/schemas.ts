@@ -23,6 +23,7 @@ export const employerSchema = z.object({
   stateOfGoverningLaw: z.string().min(2, "State of governing law is required"),
   fiscalYearEnd: z.string().min(1, "Fiscal year end is required"),
   hasAffiliatedEmployers: z.boolean(),
+  numberOfEmployees: z.string().regex(/^\d*$/, "Must be a whole number"),
 });
 
 export const planSchema = z.object({
@@ -68,6 +69,16 @@ const contactSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
   phone: z.string().min(10, "Phone number is required"),
+  title: z.string().optional(),
+});
+
+export const insurancePolicySchema = z.object({
+  id: z.string(),
+  carrierName: z.string(),
+  policyNumber: z.string(),
+  coverageType: z.enum(["medical", "dental", "vision", "life", "std", "ltd", "ad_d", "other"]),
+  coverageTypeOther: z.string(),
+  effectiveDate: z.string(),
 });
 
 export const contactsSchema = z.object({
@@ -91,4 +102,5 @@ export const fullFormSchema = z.object({
   elections: electionsSchema,
   contacts: contactsSchema,
   hipaa: hipaaSchema,
+  insurancePolicies: z.array(insurancePolicySchema),
 });
