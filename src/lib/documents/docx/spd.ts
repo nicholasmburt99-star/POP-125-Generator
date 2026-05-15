@@ -42,6 +42,8 @@ export function buildSPDParagraphs(data: FormData): Paragraph[] {
     emptyLine(),
     body(`Read this Summary Plan Description (\u201cSPD\u201d) carefully so that you understand the provisions of the Plan and the benefits you will receive. This SPD describes the Plan\u2019s benefits and obligations as contained in the Plan document, which governs the operation of the Plan. If the non-technical language in this SPD and the legal language of the Plan document conflict, the Plan document will always govern.`),
     emptyLine(),
+    body(`This Summary Plan Description summarizes the terms of the Premium Only Plan Document. If anything in this SPD conflicts with the terms of the Plan Document, the Plan Document controls. If the terms of the Plan Document conflict with the underlying Insurance Contract\u2019s description of benefits, the Insurance Contract controls as to those benefits.`),
+    emptyLine(),
     body(`The Plan is subject to the Internal Revenue Code and other federal and state laws and regulations that may affect your rights under this plan. This Plan may be amended or terminated by the Company. If the Plan is ever amended or changed, the Company will notify you.`),
     pageBreak(),
 
@@ -54,7 +56,7 @@ export function buildSPDParagraphs(data: FormData): Paragraph[] {
     body(`2. The company has adopted this Plan effective ${effective}.`),
     body(`3. This Plan\u2019s records are maintained over a twelve-month period. This is known as the Plan Year. The adopted plan year begins on ${pyStart} and ends on ${pyEnd}.`),
     body(`4. This Plan is unfunded, meaning that the funds to pay Benefits and to otherwise operate the Plan come from the general assets of the Employer.`),
-    body(`5. Plan Number: 501.`),
+    body(`5. Plan Number: 501. (501 is the default for the Employer’s first welfare benefit plan. If the Employer maintains other welfare benefit plans subject to Form 5500 filing, consult ERISA counsel to determine the correct Plan Number for this Plan.)`),
     body(`6. Type of Plan: Premium Only Plan under Section 125 of the Internal Revenue Code.`),
     body(`7. Type of Plan Administration: Employer Administration.`),
     body(`8. Number of Employees: ${data.employer.numberOfEmployees || "Not provided"}.`),
@@ -187,8 +189,12 @@ export function buildSPDParagraphs(data: FormData): Paragraph[] {
     sectionTitle(`${data.employer.stateOfGoverningLaw === "CA" ? "15" : "14"}. Premium Assistance Under Medicaid and the Children’s Health Insurance Program (CHIP)`),
     body(`If you or your children are eligible for Medicaid or CHIP and you are eligible for health coverage from your Employer, your state may have a premium assistance program that can help pay for your group health coverage. If you or your dependents are not currently enrolled in Medicaid or CHIP, you may apply for coverage by contacting your state Medicaid or CHIP office or by calling 1-877-KIDS NOW (1-877-543-7669) or visiting www.insurekidsnow.gov. If you qualify, you can ask your state whether it has a program that might help you pay the premiums for your group health coverage. If you or your dependents are eligible for premium assistance under Medicaid or CHIP, as well as eligible under your Employer’s group health plan, your Employer must permit you to enroll in the group health plan if you are not already enrolled. This is called a “special enrollment” opportunity, and you must request coverage within 60 days of being determined eligible for premium assistance. For more information about CHIP and Medicaid premium assistance, contact the Employee Benefits Security Administration at 1-866-444-EBSA (3272) or visit www.askebsa.dol.gov.`),
 
-    sectionTitle(`${data.employer.stateOfGoverningLaw === "CA" ? "16" : "15"}. Summary of Benefits and Coverage (SBC)`),
-    body(`For each group health plan option available through this Plan, you will receive a Summary of Benefits and Coverage (“SBC”) that describes the benefits, cost-sharing, and coverage limitations of that option in a standardized format prescribed by federal regulations. You are entitled to receive an SBC at open enrollment, upon request, and upon enrollment (45 C.F.R. §147.200). The SBC is provided by the insurance carrier (or, for self-funded coverage, by the Plan Administrator) rather than by this Plan itself. To request an SBC, contact the Plan Administrator or the applicable insurance carrier.`),
+    ...(data.benefits.groupMedical || data.benefits.groupDental || data.benefits.groupVision
+      ? [
+          sectionTitle(`${data.employer.stateOfGoverningLaw === "CA" ? "16" : "15"}. Summary of Benefits and Coverage (SBC)`),
+          body(`For each group health plan option available through this Plan, you will receive a Summary of Benefits and Coverage (“SBC”) that describes the benefits, cost-sharing, and coverage limitations of that option in a standardized format prescribed by federal regulations. You are entitled to receive an SBC at open enrollment, upon request, and upon enrollment (45 C.F.R. §147.200). The SBC is provided by the insurance carrier (or, for self-funded coverage, by the Plan Administrator) rather than by this Plan itself. To request an SBC, contact the Plan Administrator or the applicable insurance carrier.`),
+        ]
+      : []),
 
     pageBreak(),
     ...getErisaRightsDocxParagraphs(),

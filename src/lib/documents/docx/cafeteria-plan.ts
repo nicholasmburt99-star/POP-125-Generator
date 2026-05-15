@@ -312,6 +312,9 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
   p.push(checkboxLine(cafe.leave.reemploymentAfter30 === "wait_until_next_year", "b.  the Eligible Employee shall not resume or become a Participant until the first day of the subsequent Plan Year", { indent: 1 }));
   p.push(checkboxLine(cafe.leave.reemploymentAfter30 === "employee_choice", "c.  the Eligible Employee may elect to reinstate the Benefit election in effect at the time of Termination or make a new election under the Plan", { indent: 1 }));
 
+  p.push(subheading("ACA Eligibility Coordination"));
+  p.push(body("To the extent the Employer is subject to the employer shared-responsibility provisions of Code Section 4980H, eligibility under this Plan shall be administered consistently with the Employer’s ACA measurement methodology (whether the monthly measurement method or the look-back measurement method described in Treasury Regulation §54.4980H-3(d)), to the extent applicable. Where the look-back measurement method is used, the Standard Measurement Period, Administrative Period, and Stability Period shall be of uniform duration and shall be communicated to affected Employees in a nondiscriminatory manner."));
+
   // ===== C. PARTICIPATION ELECTIONS =====
   p.push(legalSection(sec.participation, "Participation Elections"));
   p.push(subheading("Failure to Elect (Default Elections)"));
@@ -366,7 +369,7 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
     p.push(subheading("Enrollment"));
     p.push(checkboxLine(
       cafe.premiumConversion.autoEnroll,
-      "2.  All Employees will automatically be enrolled in the Premium Conversion Account upon their date of hire and will be deemed to have elected to contribute the entire amount of any premiums payable by the Employee during the Plan Year for participation in Employer-sponsored Contract(s).",
+      "2.  Eligible Employees may be automatically enrolled in the Premium Conversion Account, or shall have prior elections continued, subject to applicable law (including the California Labor Code’s wage-deduction restrictions and the cafeteria plan regulations under Code Section 125), affirmative payroll deduction authorization where required, employee notice, electronic consent procedures where applicable, and the Employer’s enrollment procedures. Each Participant retains the right to opt out of automatic enrollment prospectively at any time during the Plan Year for HSA contributions (per IRS Notice 2004-50), and otherwise on a change-in-status basis or at the next open enrollment for Premium Conversion elections. The Plan Administrator shall establish procedures for the prompt correction and refund of any payroll deduction taken in error or without proper authorization.",
       { indent: 0 }
     ));
     p.push(noteText("If D.2 is not selected, Eligible Employees may only elect to participate in the Premium Conversion Account pursuant to Section 4.02(b), 4.02(c) and Section 4.03 of the Plan."));
@@ -691,6 +694,8 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
   p.push(numberedLine("4", "Participating Employers. Additional participating employers may be specified in an addendum to the Adoption Agreement", "", { valueBold: false }));
   p.push(numberedLine("5", "State of Organization. State of organization of Plan Sponsor", stateOfOrg));
   p.push(noteText("If state law requires written document language regarding benefits herein, add language to Addendum."));
+
+  p.push(body("6.  Controlling Document Hierarchy. This Adoption Agreement, together with the Summary Plan Description and any Appendix or Addendum, comprises the operative Section 125 cafeteria plan documents for the Employer. In the event of any conflict between this Adoption Agreement and the Summary Plan Description, the Adoption Agreement shall control. In the event of any conflict between this Adoption Agreement and an Insurance Contract or carrier policy with respect to the specific terms of an insured benefit, the Insurance Contract or carrier policy shall control.", { bold: false }));
 
   // ===== J. COBRA CONTINUATION OF COVERAGE =====
   p.push(pageBreak());

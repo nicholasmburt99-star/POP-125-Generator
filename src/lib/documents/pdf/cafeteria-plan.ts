@@ -227,6 +227,8 @@ export function buildCafeteriaPlanPDFSections(data: FormData): PDFSection[] {
       checkboxLine(ctx, cafe.leave.reemploymentAfter30 === "reinstate", "a.  Automatically reinstate prior elections.", { indent: 1 });
       checkboxLine(ctx, cafe.leave.reemploymentAfter30 === "wait_until_next_year", "b.  Wait until first day of subsequent Plan Year.", { indent: 1 });
       checkboxLine(ctx, cafe.leave.reemploymentAfter30 === "employee_choice", "c.  Employee may reinstate or make new election.", { indent: 1 });
+      subheading(ctx, "ACA Eligibility Coordination");
+      bodyText(ctx, "To the extent the Employer is subject to the employer shared-responsibility provisions of Code Section 4980H, eligibility under this Plan shall be administered consistently with the Employer’s ACA measurement methodology (whether the monthly measurement method or the look-back measurement method described in Treasury Regulation §54.4980H-3(d)), to the extent applicable. Where the look-back measurement method is used, the Standard Measurement Period, Administrative Period, and Stability Period shall be of uniform duration and shall be communicated to affected Employees in a nondiscriminatory manner.");
     }},
 
     // C. Participation
@@ -281,7 +283,7 @@ export function buildCafeteriaPlanPDFSections(data: FormData): PDFSection[] {
         checkboxLine(ctx, ct.other, `l.  Other:  ${ct.otherDescription}`, { indent: 1 });
 
         subheading(ctx, "Enrollment");
-        checkboxLine(ctx, cafe.premiumConversion.autoEnroll, "2.  All Employees automatically enrolled at hire (deemed election to contribute entire premium).");
+        checkboxLine(ctx, cafe.premiumConversion.autoEnroll, "2.  Eligible Employees may be automatically enrolled in the Premium Conversion Account, or shall have prior elections continued, subject to applicable law (including the California Labor Code’s wage-deduction restrictions and the cafeteria plan regulations under Code Section 125), affirmative payroll deduction authorization where required, employee notice, electronic consent procedures where applicable, and the Employer’s enrollment procedures. Each Participant retains the right to opt out of automatic enrollment prospectively at any time during the Plan Year for HSA contributions (per IRS Notice 2004-50), and otherwise on a change-in-status basis or at the next open enrollment for Premium Conversion elections. The Plan Administrator shall establish procedures for the prompt correction and refund of any payroll deduction taken in error or without proper authorization.");
         subheading(ctx, "Contributions");
         checkboxLine(ctx, cafe.premiumConversion.autoAdjust, "3.  Participant elections automatically adjusted for cost changes (Treas. Reg. 1.125-4(f)(2)(i)).");
       },
@@ -573,6 +575,7 @@ export function buildCafeteriaPlanPDFSections(data: FormData): PDFSection[] {
       numberedLine(ctx, "3", "Governing Law", govLaw);
       numberedLine(ctx, "4", "Participating Employers", "Additional participating employers may be specified in an addendum to the Adoption Agreement");
       numberedLine(ctx, "5", "State of Organization", stateOfOrg);
+      bodyText(ctx, "6.  Controlling Document Hierarchy. This Adoption Agreement, together with the Summary Plan Description and any Appendix or Addendum, comprises the operative Section 125 cafeteria plan documents for the Employer. In the event of any conflict between this Adoption Agreement and the Summary Plan Description, the Adoption Agreement shall control. In the event of any conflict between this Adoption Agreement and an Insurance Contract or carrier policy with respect to the specific terms of an insured benefit, the Insurance Contract or carrier policy shall control.");
     }},
 
     // J. COBRA Continuation of Coverage

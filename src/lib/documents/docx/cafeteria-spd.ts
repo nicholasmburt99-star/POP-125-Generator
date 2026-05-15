@@ -46,6 +46,7 @@ export function buildCafeteriaSPDParagraphs(data: FormData): Paragraph[] {
   p.push(emptyLine());
   p.push(body(`The Company has established a Cafeteria Plan (the “Plan”) under Section 125 of the Internal Revenue Code to allow Eligible Employees to pay for certain qualified benefits on a pre-tax basis. The benefits available under the Plan are described in this Summary Plan Description (“SPD”) and are subject to the terms of the Adoption Agreement, which governs the operation of the Plan.`));
   p.push(body(`This Plan is a full Cafeteria Plan under Section 125 of the Internal Revenue Code. Unlike a narrow Premium Only Plan (which is limited to pre-tax premium conversion), this Plan also allows you to make pre-tax contributions to Flexible Spending Accounts (FSAs), a Health Savings Account (HSA), and other reimbursement arrangements as elected by your Employer in the Adoption Agreement. The specific benefits available to you are described later in this Summary Plan Description.`));
+  p.push(body(`This Summary Plan Description summarizes the terms of the Cafeteria Plan Adoption Agreement. If anything in this SPD conflicts with the terms of the Adoption Agreement, the Adoption Agreement controls. If the terms of the Adoption Agreement conflict with the underlying Insurance Contract’s description of benefits, the Insurance Contract controls as to those benefits.`));
   p.push(emptyLine());
   p.push(body(`Read this SPD carefully so that you understand the provisions of the Plan and the benefits you and your eligible Dependents will receive. If the non-technical language in this SPD and the legal language of the Adoption Agreement or Basic Plan Document conflict, the Plan documents will always govern.`));
   p.push(emptyLine());
@@ -63,7 +64,7 @@ export function buildCafeteriaSPDParagraphs(data: FormData): Paragraph[] {
   p.push(body(`Plan Year: ${pyStart} through ${pyEnd}`));
   p.push(body(`Type of Plan: Cafeteria Plan under Section 125 of the Internal Revenue Code, including the component benefit options elected in the Adoption Agreement.`));
   p.push(body(`Type of Plan Administration: Employer Administration.`));
-  p.push(body(`Plan Number: 501`));
+  p.push(body(`Plan Number: 501. (501 is the default for the Employer’s first welfare benefit plan. If the Employer maintains other welfare benefit plans subject to Form 5500 filing, consult ERISA counsel to determine the correct Plan Number for this Plan.)`));
   p.push(body(`Funding: This Plan is unfunded. Benefits are paid from the general assets of the Employer and from Participant pre-tax contributions.`));
   p.push(body(`Number of Employees: ${data.employer.numberOfEmployees || "Not provided"}`));
   p.push(emptyLine());

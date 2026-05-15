@@ -21,6 +21,7 @@ export function buildSPDPDFSections(data: FormData): PDFSection[] {
       articleHeading(ctx, "INTRODUCTION");
       bodyText(ctx, `The Company\u2019s Premium Only Plan has been established to allow Eligible Employees to pay for certain benefits on a pre-tax basis. Read this Summary Plan Description carefully so that you understand the provisions of the Plan.`);
       bodyText(ctx, "This Plan is a Premium Only Plan under Section 125 of the Internal Revenue Code \u2014 the narrow type of cafeteria plan. It allows you to pay your share of insurance premiums (typically medical, dental, vision, and group term life) on a pre-tax basis through salary reduction. It does not allow pre-tax contributions to Health Savings Accounts (HSAs), Flexible Spending Accounts (FSAs), Dependent Care Assistance Plans, or other reimbursement accounts; those features require a full Cafeteria Plan, which your Employer has not adopted.");
+      bodyText(ctx, "This Summary Plan Description summarizes the terms of the Premium Only Plan Document. If anything in this SPD conflicts with the terms of the Plan Document, the Plan Document controls. If the terms of the Plan Document conflict with the underlying Insurance Contract\u2019s description of benefits, the Insurance Contract controls as to those benefits.");
       emptyLine(ctx);
       articleHeading(ctx, "Overview");
       sectionTitle(ctx, "General Information");
@@ -28,7 +29,7 @@ export function buildSPDPDFSections(data: FormData): PDFSection[] {
       bodyText(ctx, `2. The company has adopted this Plan effective ${effective}.`);
       bodyText(ctx, `3. The Plan Year begins on ${pyStart} and ends on ${pyEnd}.`);
       bodyText(ctx, "4. This Plan is unfunded.");
-      bodyText(ctx, "5. Plan Number: 501.");
+      bodyText(ctx, "5. Plan Number: 501. (501 is the default for the Employer’s first welfare benefit plan. If the Employer maintains other welfare benefit plans subject to Form 5500 filing, consult ERISA counsel to determine the correct Plan Number for this Plan.)");
       bodyText(ctx, "6. Type of Plan: Premium Only Plan under Section 125 of the Internal Revenue Code.");
       bodyText(ctx, "7. Type of Plan Administration: Employer Administration.");
       bodyText(ctx, `8. Number of Employees: ${data.employer.numberOfEmployees || "Not provided"}.`);
@@ -114,8 +115,10 @@ export function buildSPDPDFSections(data: FormData): PDFSection[] {
       bodyText(ctx, "If you or your children are eligible for Medicaid or CHIP and you are eligible for health coverage from your Employer, your state may have a premium assistance program that can help pay for your group health coverage. If you or your dependents are not currently enrolled in Medicaid or CHIP, you may apply for coverage by contacting your state Medicaid or CHIP office or by calling 1-877-KIDS NOW (1-877-543-7669) or visiting www.insurekidsnow.gov. If you qualify, you can ask your state whether it has a program that might help you pay the premiums for your group health coverage. If you or your dependents are eligible for premium assistance under Medicaid or CHIP, as well as eligible under your Employer’s group health plan, your Employer must permit you to enroll in the group health plan if you are not already enrolled. This is called a “special enrollment” opportunity, and you must request coverage within 60 days of being determined eligible for premium assistance. For more information about CHIP and Medicaid premium assistance, contact the Employee Benefits Security Administration at 1-866-444-EBSA (3272) or visit www.askebsa.dol.gov.");
       n++;
 
-      sectionTitle(ctx, `${n}. Summary of Benefits and Coverage (SBC)`);
-      bodyText(ctx, "For each group health plan option available through this Plan, you will receive a Summary of Benefits and Coverage (“SBC”) that describes the benefits, cost-sharing, and coverage limitations of that option in a standardized format prescribed by federal regulations. You are entitled to receive an SBC at open enrollment, upon request, and upon enrollment (45 C.F.R. §147.200). The SBC is provided by the insurance carrier (or, for self-funded coverage, by the Plan Administrator) rather than by this Plan itself. To request an SBC, contact the Plan Administrator or the applicable insurance carrier.");
+      if (data.benefits.groupMedical || data.benefits.groupDental || data.benefits.groupVision) {
+        sectionTitle(ctx, `${n}. Summary of Benefits and Coverage (SBC)`);
+        bodyText(ctx, "For each group health plan option available through this Plan, you will receive a Summary of Benefits and Coverage (“SBC”) that describes the benefits, cost-sharing, and coverage limitations of that option in a standardized format prescribed by federal regulations. You are entitled to receive an SBC at open enrollment, upon request, and upon enrollment (45 C.F.R. §147.200). The SBC is provided by the insurance carrier (or, for self-funded coverage, by the Plan Administrator) rather than by this Plan itself. To request an SBC, contact the Plan Administrator or the applicable insurance carrier.");
+      }
     }},
     { build: (ctx) => getErisaRightsPDFBuilder(ctx) },
   ];
