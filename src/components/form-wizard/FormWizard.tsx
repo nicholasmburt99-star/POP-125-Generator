@@ -56,7 +56,6 @@ const defaultFormData: FormData = {
     groupDental: false,
     groupVision: false,
     groupTermLife: false,
-    hsa: false,
   },
   elections: {
     employeeElections: "first_year_only",
@@ -113,7 +112,6 @@ function hydrateLegacyFormData(data: FormData): FormData {
       groupDental: b.groupDental ?? false,
       groupVision: b.groupVision ?? false,
       groupTermLife: b.groupTermLife ?? false,
-      hsa: b.hsa ?? false,
     },
     hipaa: data.hipaa ?? {
       privacyOfficerName: "",

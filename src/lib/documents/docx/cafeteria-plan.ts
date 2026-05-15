@@ -93,6 +93,7 @@ export function buildCafeteriaPlanParagraphs(data: FormData): Paragraph[] {
   p.push(centeredText("CAFETERIA PLAN", SUBHEADING_SIZE, true));
   p.push(emptyLine());
   p.push(body("The undersigned adopting employer hereby adopts this Plan. The Plan is intended to qualify as a cafeteria plan under Code section 125. The Plan shall consist of this Adoption Agreement and the related Summary Plan Description, together with any Appendix or Addendum to the Adoption Agreement, all of which are incorporated herein by reference."));
+  p.push(body("This Plan is a full Cafeteria Plan under Section 125 of the Internal Revenue Code — the broader form of cafeteria plan. In addition to permitting pre-tax salary reduction for insurance premiums (which a Premium Only Plan also permits), this Plan supports one or more of the following pre-tax features, as elected by the Employer in this Adoption Agreement: Premium Conversion Account; Flexible Spending Accounts (Health FSA, Limited-Purpose Health FSA, Post-Deductible Health FSA, Dependent Care Assistance Plan, Adoption Assistance FSA); Health Savings Account salary-reduction contributions; Flexible Benefit Credits; and Purchase or Sale of Paid Time Off."));
   p.push(emptyLine());
 
   // ===== COMPANY INFORMATION =====

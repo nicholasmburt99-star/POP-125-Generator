@@ -38,7 +38,8 @@ export function buildCafeteriaSPDPDFSections(data: FormData): PDFSection[] {
     // Introduction
     { build: (ctx) => {
       articleHeading(ctx, "INTRODUCTION");
-      bodyText(ctx, "The Company has established a Cafeteria Plan (the “Plan”) under Section 125 of the Internal Revenue Code to allow Eligible Employees to pay for certain qualified benefits on a pre-tax basis. The benefits available under the Plan are described in this Summary Plan Description (“SPD”) and are subject to the terms of the Adoption Agreement and the Basic Plan Document, which together govern the operation of the Plan.");
+      bodyText(ctx, "The Company has established a Cafeteria Plan (the “Plan”) under Section 125 of the Internal Revenue Code to allow Eligible Employees to pay for certain qualified benefits on a pre-tax basis. The benefits available under the Plan are described in this Summary Plan Description (“SPD”) and are subject to the terms of the Adoption Agreement, which governs the operation of the Plan.");
+      bodyText(ctx, "This Plan is a full Cafeteria Plan under Section 125 of the Internal Revenue Code. Unlike a narrow Premium Only Plan (which is limited to pre-tax premium conversion), this Plan also allows you to make pre-tax contributions to Flexible Spending Accounts (FSAs), a Health Savings Account (HSA), and other reimbursement arrangements as elected by your Employer in the Adoption Agreement. The specific benefits available to you are described later in this Summary Plan Description.");
       emptyLine(ctx);
       bodyText(ctx, "Read this SPD carefully so that you understand the provisions of the Plan and the benefits you and your eligible Dependents will receive. If the non-technical language in this SPD and the legal language of the Adoption Agreement or Basic Plan Document conflict, the Plan documents will always govern.");
       emptyLine(ctx);

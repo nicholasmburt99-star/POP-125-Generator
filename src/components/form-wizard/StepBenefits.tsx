@@ -22,7 +22,7 @@ export function StepBenefits({ data, onChange, onNext, onBack }: Props) {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!data.groupMedical && !data.groupDental && !data.groupVision && !data.groupTermLife && !data.hsa) {
+    if (!data.groupMedical && !data.groupDental && !data.groupVision && !data.groupTermLife) {
       setError("At least one benefit must be selected");
       return;
     }
@@ -90,24 +90,6 @@ export function StepBenefits({ data, onChange, onNext, onBack }: Props) {
             Coverage above $50,000 is subject to Section 79 imputed income on the
             employee&apos;s W-2; only the premium for the first $50,000 of coverage
             is eligible for pre-tax treatment.
-          </p>
-        </div>
-        <div className="rounded-lg border p-4">
-          <div className="flex items-center space-x-3">
-            <Checkbox
-              id="hsa"
-              checked={data.hsa}
-              onCheckedChange={() => toggle("hsa")}
-            />
-            <Label htmlFor="hsa" className="text-base font-normal">
-              Health Savings Account (HSA) — Pre-tax HDHP-paired HSA contributions
-            </Label>
-          </div>
-          <p className="text-xs text-gray-500 mt-2 ml-7">
-            Only check this if the Employer offers a high-deductible health plan
-            (HDHP) and permits employees to make pre-tax HSA contributions through
-            this Plan. HSA contributions require enrollment in an HDHP and the
-            absence of disqualifying coverage.
           </p>
         </div>
       </div>

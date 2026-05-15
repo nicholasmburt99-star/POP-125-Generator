@@ -90,7 +90,6 @@ export function StepReview({
     benefits.groupDental && "Group Dental",
     benefits.groupVision && "Group Vision",
     benefits.groupTermLife && "Group Term Life (up to $50K pre-tax)",
-    benefits.hsa && "HSA (pre-tax HDHP-paired)",
   ]
     .filter(Boolean)
     .join(", ");

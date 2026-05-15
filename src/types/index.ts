@@ -54,7 +54,6 @@ export interface PlanBenefits {
   groupDental: boolean;
   groupVision: boolean;
   groupTermLife: boolean;
-  hsa: boolean;
 }
 
 export interface HIPAADesignation {
